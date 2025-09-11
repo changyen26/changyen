@@ -2,8 +2,8 @@
 
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FileData } from '@/types/admin';
-import { adminApi } from '@/lib/adminApi';
+import { FileData } from '../../types/admin';
+import { adminApi } from '../../lib/adminApi';
 
 interface FileUploadProps {
   onFileUpload: (file: FileData) => void;

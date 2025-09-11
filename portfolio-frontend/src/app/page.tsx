@@ -1,9 +1,9 @@
-import Navigation from '@/components/common/Navigation';
-import HeroSection from '@/components/sections/HeroSection';
-import AboutSection from '@/components/sections/AboutSection';
-import PatentsSection from '@/components/sections/PatentsSection';
-import CompetitionsSection from '@/components/sections/CompetitionsSection';
-import NewsSection from '@/components/sections/NewsSection';
+import Navigation from '../components/common/Navigation';
+import HeroSection from '../components/sections/HeroSection';
+import AboutSection from '../components/sections/AboutSection';
+import PatentsSection from '../components/sections/PatentsSection';
+import CompetitionsSection from '../components/sections/CompetitionsSection';
+import NewsSection from '../components/sections/NewsSection';
 
 export default function Home() {
   return (

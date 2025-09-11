@@ -1,6 +1,6 @@
 import { HTMLAttributes, forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration'
