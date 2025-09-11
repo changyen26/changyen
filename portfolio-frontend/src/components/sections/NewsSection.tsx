@@ -70,7 +70,7 @@ export default function NewsSection() {
           animate={isInView ? "visible" : "hidden"}
           className="grid gap-8 lg:grid-cols-3"
         >
-          {mockNews.map((article, index) => (
+          {mockNews.map((article) => (
             <motion.div
               key={article.id}
               variants={itemVariants}

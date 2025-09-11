@@ -21,7 +21,6 @@ export default function TypewriterText({
   onComplete
 }: TypewriterTextProps) {
   const [displayedText, setDisplayedText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     if (!text) return;

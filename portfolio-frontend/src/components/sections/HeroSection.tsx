@@ -8,7 +8,6 @@ import { mockUser } from '@/data/mockData';
 import Button from '@/components/common/Button';
 import TypewriterText from '@/components/animations/TypewriterText';
 import MagneticButton from '@/components/animations/MagneticButton';
-import ParallaxBackground from '@/components/animations/ParallaxBackground';
 
 export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);

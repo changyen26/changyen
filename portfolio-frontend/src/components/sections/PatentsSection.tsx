@@ -99,7 +99,7 @@ export default function PatentsSection() {
           animate={isInView ? "visible" : "hidden"}
           className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
         >
-          {filteredPatents.map((patent, index) => (
+          {filteredPatents.map((patent) => (
             <motion.div
               key={patent.id}
               variants={itemVariants}
