@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Button from '@/components/common/Button';
-import Card from '@/components/common/Card';
-import { UserInfo } from '@/types/admin';
-import { adminApi } from '@/lib/adminApi';
+import Button from '../../components/common/Button';
+import Card from '../../components/common/Card';
+import { UserInfo } from '../../types/admin';
+import { adminApi } from '../../lib/adminApi';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

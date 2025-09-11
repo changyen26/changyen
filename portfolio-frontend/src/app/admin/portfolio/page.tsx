@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Button from '@/components/common/Button';
-import Card from '@/components/common/Card';
-import { UserInfo, Project, Skill } from '@/types/admin';
-import { adminApi } from '@/lib/adminApi';
+import Button from '../../../components/common/Button';
+import Card from '../../../components/common/Card';
+import { UserInfo, Project, Skill } from '../../../types/admin';
+import { adminApi } from '../../../lib/adminApi';
 
 export default function PortfolioPreviewPage() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
