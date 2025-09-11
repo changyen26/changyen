@@ -8,8 +8,7 @@ import { formatDate } from '@/lib/utils';
 import { useInView } from '@/hooks/useInView';
 import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';
-import { adminApi } from '@/lib/adminApi';
-import { NewsArticle } from '@/types/admin';
+import { NewsArticle } from '@/types';
 
 export default function NewsSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });
@@ -19,17 +18,15 @@ export default function NewsSection() {
   useEffect(() => {
     const loadNews = async () => {
       try {
-        const newsData = await adminApi.getNews();
-        console.log('NewsSection loaded news data:', newsData);
-        if (newsData && newsData.length > 0) {
-          setNews(newsData);
-        } else {
-          // 如果沒有管理後台的新聞數據，使用 mockNews 作為預設
-          setNews(mockNews);
-        }
+        // 暫時只使用 mockNews，直到統一 API 回應格式
+        setNews(mockNews);
+        // TODO: 統一 adminApi.getNews() 和 mockNews 的類型格式
+        // const newsData = await adminApi.getNews();
+        // if (newsData && newsData.length > 0) {
+        //   setNews(newsData);
+        // }
       } catch (error) {
         console.error('Failed to load news:', error);
-        // 發生錯誤時使用 mockNews
         setNews(mockNews);
       }
     };

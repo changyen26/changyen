@@ -38,7 +38,7 @@ interface RecentViewsData {
 }
 
 // 新聞介面
-interface NewsItem {
+export interface NewsItem {
   id: string;
   title: string;
   content: string;

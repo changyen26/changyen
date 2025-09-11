@@ -149,8 +149,9 @@ def register_routes(app):
                 return jsonify({"error": "密碼為必填欄位"}), 400
             
             password = data['password']
-            # 使用簡單的硬編碼密碼驗證
-            if password == 'admin123':
+            # 從環境變數獲取管理員密碼，如果沒有設定則使用預設值
+            admin_password = os.getenv('ADMIN_PASSWORD', 'admin123')
+            if password == admin_password:
                 return jsonify({"success": True, "message": "登入成功"}), 200
             else:
                 return jsonify({"error": "密碼錯誤"}), 401
