@@ -149,7 +149,7 @@ export default function CompetitionsSection() {
                     </div>
 
                     <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      {competition.name}
+                      {competition.title}
                     </h3>
 
                     <div className="flex items-center gap-4 mb-4">

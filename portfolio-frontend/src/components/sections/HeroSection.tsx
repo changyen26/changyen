@@ -19,7 +19,7 @@ export default function HeroSection() {
     email: "changyen26@gmail.com",
     phone: "+886 912 345 678",
     title: "全端開發工程師",
-    bio: "專精於現代化網頁開發，擁有豐富的前端和後端開發經驗",
+    description: "專精於現代化網頁開發，擁有豐富的前端和後端開發經驗",
     github: "https://github.com/changyen26",
     linkedin: "https://linkedin.com/in/changyen",
     avatar: "",
@@ -177,7 +177,7 @@ export default function HeroSection() {
           transition={{ duration: 1, delay: 1 }}
           className="text-lg text-gray-500 mb-12 max-w-3xl mx-auto"
         >
-          {userInfo.bio}
+          {userInfo.description}
         </motion.p>
 
         <motion.div

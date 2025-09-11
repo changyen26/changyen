@@ -9,11 +9,12 @@ import { useInView } from '@/hooks/useInView';
 import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';
 import { adminApi } from '@/lib/adminApi';
+import { NewsArticle } from '@/types/admin';
 
 export default function NewsSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
-  const [news, setNews] = useState<{ id: string; title: string; content: string; excerpt?: string; publishedAt: string; tags?: string[]; featured?: boolean; imageUrl?: string; createdAt: string; }[]>([]);
+  const [news, setNews] = useState<NewsArticle[]>([]);
 
   useEffect(() => {
     const loadNews = async () => {
