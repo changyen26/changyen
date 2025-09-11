@@ -1,0 +1,16 @@
+{
+  "name": "測試所有欄位競賽",
+  "result": "冠軍",
+  "description": "這是測試所有欄位的競賽描述",
+  "date": "2024-09-11",
+  "certificateUrl": "",
+  "category": "技術創新",
+  "featured": true,
+  "organizer": "測試主辦單位",
+  "location": "台北市信義區",
+  "award": "最佳創新獎",
+  "teamSize": 4,
+  "role": "技術負責人",
+  "projectUrl": "https://github.com/test/project",
+  "technologies": ["React", "FastAPI", "MySQL", "TypeScript"]
+}

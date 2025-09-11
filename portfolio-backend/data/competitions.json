@@ -1,0 +1,48 @@
+[
+  {
+    "id": "c9040df0-bd8b-4c4f-8f43-707142f7d698",
+    "name": "測試編輯功能競賽",
+    "result": "優勝",
+    "description": "這是測試所有編輯欄位的完整功能",
+    "date": "2024-10-01",
+    "certificateUrl": "https://example.com/cert",
+    "category": "技術創新",
+    "featured": true,
+    "organizer": "測試主辦單位更新",
+    "location": "高雄市",
+    "award": "特別創新獎",
+    "teamSize": 5,
+    "role": "專案經理",
+    "projectUrl": "https://github.com/test/updated-project",
+    "technologies": [
+      "Vue.js",
+      "Node.js",
+      "MongoDB",
+      "Docker",
+      "Kubernetes"
+    ],
+    "createdAt": "2024-09-11T00:00:00"
+  },
+  {
+    "id": "f4597baa-9b58-4034-862d-a7d5d66ec397",
+    "name": "全國大學生程式設計競賽",
+    "result": "亞軍",
+    "description": "程式設計競賽，解決複雜的演算法問題",
+    "date": "2024-08-15",
+    "certificateUrl": "",
+    "category": "程式設計",
+    "featured": true,
+    "organizer": "教育部",
+    "location": "台中市",
+    "award": "亞軍獎",
+    "teamSize": 3,
+    "role": "隊長",
+    "projectUrl": "",
+    "technologies": [
+      "C++",
+      "Python",
+      "Algorithm"
+    ],
+    "createdAt": "2024-08-15T00:00:00"
+  }
+]

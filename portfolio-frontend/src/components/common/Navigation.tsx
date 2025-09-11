@@ -70,7 +70,7 @@ export default function Navigation() {
             className="flex-shrink-0"
           >
             <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              張智強
+              謝長諺
             </h1>
           </motion.div>
 

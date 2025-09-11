@@ -2,16 +2,44 @@
 
 import { motion } from 'framer-motion';
 import { Newspaper, Calendar, ExternalLink, Eye } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { mockNews } from '@/data/mockData';
 import { formatDate } from '@/lib/utils';
 import { useInView } from '@/hooks/useInView';
 import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';
+import { adminApi } from '@/lib/adminApi';
 
 export default function NewsSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
+  const [news, setNews] = useState<{ id: string; title: string; content: string; excerpt?: string; publishedAt: string; tags?: string[]; featured?: boolean; imageUrl?: string; createdAt: string; }[]>([]);
+
+  useEffect(() => {
+    const loadNews = async () => {
+      try {
+        const newsData = await adminApi.getNews();
+        console.log('NewsSection loaded news data:', newsData);
+        if (newsData && newsData.length > 0) {
+          setNews(newsData);
+        } else {
+          // 如果沒有管理後台的新聞數據，使用 mockNews 作為預設
+          setNews(mockNews);
+        }
+      } catch (error) {
+        console.error('Failed to load news:', error);
+        // 發生錯誤時使用 mockNews
+        setNews(mockNews);
+      }
+    };
+
+    loadNews();
+
+    // 定期重新載入數據
+    const interval = setInterval(loadNews, 30000); // 30秒重新載入一次
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -66,7 +94,7 @@ export default function NewsSection() {
           animate={isInView ? "visible" : "hidden"}
           className="grid gap-8 lg:grid-cols-3"
         >
-          {mockNews.map((article) => (
+          {news.map((article) => (
             <motion.div
               key={article.id}
               variants={itemVariants}
@@ -173,7 +201,7 @@ export default function NewsSection() {
                   animate={isInView ? { scale: 1 } : {}}
                   transition={{ duration: 0.5, delay: 1 }}
                 >
-                  {mockNews.length}
+                  {news.length}
                 </motion.div>
                 <div className="text-gray-600">報導總數</div>
               </div>
@@ -185,7 +213,7 @@ export default function NewsSection() {
                   animate={isInView ? { scale: 1 } : {}}
                   transition={{ duration: 0.5, delay: 1.1 }}
                 >
-                  {new Set(mockNews.map(n => n.media_outlet)).size}
+                  {new Set(news.map(n => n.media_outlet)).size}
                 </motion.div>
                 <div className="text-gray-600">媒體機構</div>
               </div>

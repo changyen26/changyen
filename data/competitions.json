@@ -1,0 +1,47 @@
+[
+  {
+    "id": "a623c416-d2c3-4dc3-bfa4-1203f14e108a",
+    "name": "台灣科技創新競賽",
+    "result": "冠軍",
+    "description": "這是一個很棒的競賽，展現了技術創新的成果",
+    "date": "2024-09-11",
+    "certificateUrl": "",
+    "category": "技術創新",
+    "featured": true,
+    "organizer": "科技部",
+    "location": "台北市信義區",
+    "award": "最佳技術創新獎",
+    "teamSize": 4,
+    "role": "技術負責人",
+    "projectUrl": "https://github.com/example/project",
+    "technologies": [
+      "Python",
+      "React",
+      "TensorFlow",
+      "Docker"
+    ],
+    "createdAt": "2024-09-11T00:00:00"
+  },
+  {
+    "id": "b60a2927-f074-4920-9324-18671c67a915",
+    "name": "全國大學生程式設計競賽",
+    "result": "亞軍",
+    "description": "程式設計競賽，解決複雜的演算法問題",
+    "date": "2024-08-15",
+    "certificateUrl": "",
+    "category": "程式設計",
+    "featured": true,
+    "organizer": "教育部",
+    "location": "台中市",
+    "award": "亞軍獎",
+    "teamSize": 3,
+    "role": "隊長",
+    "projectUrl": "",
+    "technologies": [
+      "C++",
+      "Python",
+      "Algorithm"
+    ],
+    "createdAt": "2024-08-15T00:00:00"
+  }
+]

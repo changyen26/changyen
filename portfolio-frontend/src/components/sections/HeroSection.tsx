@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Mail, Phone } from 'lucide-react';
 import { gsap } from 'gsap';
-import { mockUser } from '@/data/mockData';
+import { UserInfo } from '@/types/admin';
+import { adminApi } from '@/lib/adminApi';
 import Button from '@/components/common/Button';
 import TypewriterText from '@/components/animations/TypewriterText';
 import MagneticButton from '@/components/animations/MagneticButton';
@@ -13,8 +14,38 @@ export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    name: "張智強",
+    email: "changyen26@gmail.com",
+    phone: "+886 912 345 678",
+    title: "全端開發工程師",
+    bio: "專精於現代化網頁開發，擁有豐富的前端和後端開發經驗",
+    github: "https://github.com/changyen26",
+    linkedin: "https://linkedin.com/in/changyen",
+    avatar: "",
+    location: "台灣",
+    website: ""
+  });
 
   useEffect(() => {
+    // Load user data
+    const loadUserData = async () => {
+      try {
+        const userData = await adminApi.getUserInfo();
+        console.log('HeroSection loaded user data:', userData);
+        if (userData) {
+          setUserInfo(userData);
+        }
+      } catch (error) {
+        console.error('Failed to load user info in HeroSection:', error);
+      }
+    };
+
+    loadUserData();
+
+    // Set up periodic reload for real-time updates
+    const interval = setInterval(loadUserData, 30000); // 30 seconds
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
       
@@ -52,7 +83,10 @@ export default function HeroSection() {
       }, '-=0.3');
     }, heroRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -70,29 +104,41 @@ export default function HeroSection() {
     >
       {/* 浮動的幾何形狀 */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full"
-            style={{
-              width: `${Math.random() * 300 + 100}px`,
-              height: `${Math.random() * 300 + 100}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              x: [0, Math.random() * 100 - 50],
-              y: [0, Math.random() * 100 - 50],
-              rotate: [0, 360],
-            }}
-            transition={{
-              duration: Math.random() * 20 + 10,
-              repeat: Infinity,
-              repeatType: 'reverse',
-              ease: 'linear'
-            }}
-          />
-        ))}
+        {[...Array(6)].map((_, i) => {
+          // 使用索引作為種子來生成一致的"隨機"值
+          const seed = i * 137.5; // 使用黃金角度作為基礎
+          const width = ((seed * 47) % 200) + 100; // 100-300px
+          const height = ((seed * 53) % 200) + 100; // 100-300px
+          const left = (seed * 17) % 100; // 0-100%
+          const top = (seed * 23) % 100; // 0-100%
+          const x = ((seed * 31) % 100) - 50; // -50 to 50
+          const y = ((seed * 41) % 100) - 50; // -50 to 50
+          const duration = ((seed * 7) % 10) + 10; // 10-20s
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full"
+              style={{
+                width: `${width}px`,
+                height: `${height}px`,
+                left: `${left}%`,
+                top: `${top}%`,
+              }}
+              animate={{
+                x: [0, x],
+                y: [0, y],
+                rotate: [0, 360],
+              }}
+              transition={{
+                duration: duration,
+                repeat: Infinity,
+                repeatType: 'reverse',
+                ease: 'linear'
+              }}
+            />
+          );
+        })}
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
@@ -103,13 +149,13 @@ export default function HeroSection() {
           className="mb-8"
         >
           <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center text-4xl font-bold text-white shadow-2xl">
-            {mockUser.name.charAt(0)}
+            {userInfo.name.charAt(0)}
           </div>
         </motion.div>
 
         <h1 className="text-6xl md:text-8xl font-bold text-gray-900 mb-6 leading-tight">
           <TypewriterText 
-            text={mockUser.name}
+            text={userInfo.name}
             delay={500}
             speed={100}
             showCursor={false}
@@ -118,7 +164,7 @@ export default function HeroSection() {
 
         <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
           <TypewriterText 
-            text={mockUser.title}
+            text={userInfo.title}
             delay={2000}
             speed={50}
             showCursor={false}
@@ -131,7 +177,7 @@ export default function HeroSection() {
           transition={{ duration: 1, delay: 1 }}
           className="text-lg text-gray-500 mb-12 max-w-3xl mx-auto"
         >
-          {mockUser.bio}
+          {userInfo.bio}
         </motion.p>
 
         <motion.div
@@ -160,7 +206,7 @@ export default function HeroSection() {
           <div className="flex gap-4">
             <MagneticButton strength={0.2}>
               <motion.a
-                href={`mailto:${mockUser.email}`}
+                href={`mailto:${userInfo.email}`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200/50"
@@ -171,7 +217,7 @@ export default function HeroSection() {
             
             <MagneticButton strength={0.2}>
               <motion.a
-                href={`tel:${mockUser.phone}`}
+                href={`tel:${userInfo.phone}`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200/50"

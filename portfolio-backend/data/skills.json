@@ -1,0 +1,37 @@
+[
+  {
+    "id": "bdc3bcd8-7583-4194-8bb5-28c27b3e3ff9",
+    "name": "JavaScript",
+    "level": 90,
+    "category": "程式語言",
+    "icon": ""
+  },
+  {
+    "id": "314f5cfb-8277-452e-9a4c-c7ed040cc0b0",
+    "name": "Python",
+    "level": 85,
+    "category": "程式語言",
+    "icon": ""
+  },
+  {
+    "id": "96ffb0b4-7de8-4faa-b341-f88878f00522",
+    "name": "React",
+    "level": 88,
+    "category": "前端框架",
+    "icon": ""
+  },
+  {
+    "id": "15aaea80-9aa5-40d1-b77b-6c355dd80b21",
+    "name": "Node.js",
+    "level": 80,
+    "category": "後端技術",
+    "icon": ""
+  },
+  {
+    "id": "3de71e42-6c50-4324-938f-c145ad009f36",
+    "name": "MySQL",
+    "level": 75,
+    "category": "資料庫",
+    "icon": ""
+  }
+]

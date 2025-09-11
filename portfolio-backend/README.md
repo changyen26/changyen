@@ -1,101 +1,92 @@
 # Portfolio Backend API
 
-個人履歷展示網站的後端API服務，基於FastAPI構建。
+個人作品集網站的後端API服務，使用Flask框架開發。
 
 ## 功能特色
 
-- ✅ RESTful API 設計
-- ✅ MySQL 資料庫整合
-- ✅ 自動化API文檔 (Swagger/OpenAPI)
-- ✅ CORS 跨域支援
-- ✅ 數據驗證 (Pydantic)
-- ✅ 資料庫ORM (SQLAlchemy)
+- 使用JSON文件作為數據存儲（輕量化部署）
+- 完整的CRUD API操作
+- 支持中文字符
+- CORS跨域支持
+- 文件上傳功能
+- RESTful API設計
 
-## 安裝與運行
+## 快速開始
 
-### 方法1: 使用pip安裝依賴
+### 環境要求
 
-```bash
-# 安裝依賴
-pip install -r requirements.txt
+- Python 3.8+
+- Flask 3.0+
 
-# 初始化資料庫
-python -m app.utils.init_db
-
-# 啟動服務器
-python run.py
-```
-
-### 方法2: 使用虛擬環境
+### 安裝依賴
 
 ```bash
-# 創建虛擬環境
-python -m venv venv
-
-# 啟動虛擬環境 (Windows)
-venv\Scripts\activate
-# 或 (Linux/Mac)
-source venv/bin/activate
-
-# 安裝依賴
 pip install -r requirements.txt
-
-# 初始化資料庫
-python -m app.utils.init_db
-
-# 啟動服務器
-python run.py
 ```
 
-## API 文檔
+### 啟動服務
 
-服務器啟動後，可以通過以下URL訪問API文檔：
-
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-## 環境配置
-
-確保 `.env` 文件包含正確的配置：
-
-```env
-DATABASE_URL=mysql+pymysql://username:password@host:port/database
-BACKEND_CORS_ORIGINS=["http://localhost:3000","http://localhost:3001"]
+```bash
+python app.py
 ```
+
+服務將運行在 `http://localhost:8000`
 
 ## API 端點
 
-### 用戶 (/api/v1/users)
-- GET `/` - 獲取用戶列表
-- GET `/{user_id}` - 獲取用戶詳情
-- POST `/` - 創建用戶
-- PUT `/{user_id}` - 更新用戶
-- DELETE `/{user_id}` - 刪除用戶
+### 健康檢查
+- `GET /health` - 服務器健康狀態
 
-### 專利 (/api/v1/patents)
-- GET `/` - 獲取專利列表 (支持用戶和分類篩選)
-- GET `/{patent_id}` - 獲取專利詳情
-- POST `/` - 創建專利
-- PUT `/{patent_id}` - 更新專利
-- DELETE `/{patent_id}` - 刪除專利
+### 用戶管理
+- `GET /api/v1/user` - 獲取用戶信息
+- `POST /api/v1/user/update` - 更新用戶信息
 
-### 競賽 (/api/v1/competitions)
-- GET `/` - 獲取競賽列表
-- GET `/{competition_id}` - 獲取競賽詳情
-- POST `/` - 創建競賽記錄
-- PUT `/{competition_id}` - 更新競賽
-- DELETE `/{competition_id}` - 刪除競賽
+### 競賽管理
+- `GET /api/v1/competitions` - 獲取所有競賽
+- `POST /api/v1/competitions` - 創建新競賽
+- `GET /api/v1/competitions/{id}` - 獲取特定競賽
+- `PUT /api/v1/competitions/{id}` - 更新競賽
+- `DELETE /api/v1/competitions/{id}` - 刪除競賽
 
-### 新聞 (/api/v1/news)
-- GET `/` - 獲取新聞列表
-- GET `/{article_id}` - 獲取新聞詳情
-- POST `/` - 創建新聞
-- PUT `/{article_id}` - 更新新聞
-- DELETE `/{article_id}` - 刪除新聞
+### 項目管理
+- `GET /api/v1/projects` - 獲取所有項目
+- `POST /api/v1/projects` - 創建新項目
+- `PUT /api/v1/projects/{id}` - 更新項目
+- `DELETE /api/v1/projects/{id}` - 刪除項目
 
-## 資料庫結構
+### 技能管理
+- `GET /api/v1/skills` - 獲取所有技能
+- `POST /api/v1/skills` - 創建新技能
+- `PUT /api/v1/skills/{id}` - 更新技能
+- `DELETE /api/v1/skills/{id}` - 刪除技能
 
-- `users` - 用戶基本信息
-- `patents` - 專利信息
-- `competitions` - 競賽獲獎記錄
-- `news_articles` - 媒體報導記錄
+### 新聞管理
+- `GET /api/v1/news` - 獲取所有新聞
+- `POST /api/v1/news` - 創建新聞
+
+### 文件管理
+- `POST /api/v1/files` - 上傳文件
+- `GET /api/v1/files/{id}` - 獲取文件
+
+## 數據存儲
+
+所有數據存儲在 `data/` 目錄下的JSON文件中：
+- `competitions.json` - 競賽資料
+- `user.json` - 用戶資料
+- `skills.json` - 技能資料
+- `projects.json` - 項目資料
+- `news.json` - 新聞資料
+- `uploads/` - 上傳的文件
+
+## 開發模式
+
+服務器會在 debug 模式下運行，支持：
+- 熱重載
+- 詳細錯誤信息
+- 自動初始化測試數據
+
+## 注意事項
+
+- 此API設計用於開發和小規模部署
+- 生產環境建議使用專業數據庫（如MySQL、PostgreSQL）
+- 文件上傳大小和類型可根據需求調整

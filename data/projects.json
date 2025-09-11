@@ -1,0 +1,18 @@
+[
+  {
+    "id": "ec067c6d-42d0-44e6-b963-b8eb28119678",
+    "title": "個人作品集網站",
+    "description": "使用 Next.js 和 FastAPI 開發的個人作品集網站",
+    "technologies": [
+      "Next.js",
+      "TypeScript",
+      "FastAPI",
+      "Tailwind CSS"
+    ],
+    "imageUrl": "",
+    "githubUrl": "https://github.com/example/portfolio",
+    "liveUrl": "https://portfolio.example.com",
+    "featured": true,
+    "createdAt": "2025-09-11T23:56:10.217010"
+  }
+]
