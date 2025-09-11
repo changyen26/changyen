@@ -72,6 +72,14 @@ def create_app(config_name=None):
     # 設定 JSON 編碼
     app.config['JSON_AS_ASCII'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+    app.config['JSON_SORT_KEYS'] = False
+    
+    # 強制 UTF-8 編碼
+    import sys
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
+    if hasattr(sys.stderr, 'reconfigure'):
+        sys.stderr.reconfigure(encoding='utf-8')
     
     # 初始化擴展
     db.init_app(app)
