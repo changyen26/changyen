@@ -21,8 +21,8 @@ class Config:
     MYSQL_PORT = os.environ.get('MYSQL_PORT') or os.environ.get('DB_PORT') or '3306'
     MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE') or os.environ.get('DB_NAME') or 'portfolio'
     
-    # SQLAlchemy 配置
-    SQLALCHEMY_DATABASE_URI = (
+    # SQLAlchemy 配置 - 優先使用 DATABASE_URL
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or (
         f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@"
         f"{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}?charset=utf8mb4"
     )
