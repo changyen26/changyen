@@ -30,7 +30,7 @@ export default function PortfolioPreviewPage() {
       setProjects(projectsData || []);
       setSkills(skillsData || []);
     } catch {
-      console.error('Failed to load data:', error);
+      console.error('Failed to load data:');
     } finally {
       setIsLoading(false);
     }

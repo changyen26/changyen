@@ -49,7 +49,7 @@ export default function CompetitionsPage() {
     role: '',
     technologies: [],
     certificateUrl: '',
-    certificateFile: null,
+    certificateFile: undefined,
     projectUrl: '',
     featured: false,
     createdAt: new Date().toISOString()
@@ -65,7 +65,7 @@ export default function CompetitionsPage() {
       const competitionData = await adminApi.getCompetitions();
       setCompetitions(competitionData || []);
     } catch {
-      console.error('Failed to load competitions:', error);
+      console.error('Failed to load competitions:');
     }
   };
 
@@ -127,7 +127,7 @@ export default function CompetitionsPage() {
         role: '',
         technologies: [],
         certificateUrl: '',
-        certificateFile: null,
+        certificateFile: undefined,
         projectUrl: '',
         featured: false,
         createdAt: new Date().toISOString()
@@ -153,7 +153,7 @@ export default function CompetitionsPage() {
       role: '',
       technologies: [],
       certificateUrl: '',
-      certificateFile: null,
+      certificateFile: undefined,
       projectUrl: '',
       featured: false,
       createdAt: new Date().toISOString()
@@ -363,9 +363,9 @@ export default function CompetitionsPage() {
                   <FileUpload
                     label="證書上傳"
                     acceptedTypes={['image/jpeg', 'image/png', 'image/gif', 'application/pdf']}
-                    currentFile={editingCompetition.certificateFile || null}
+                    currentFile={editingCompetition.certificateFile}
                     onFileUpload={(file) => setEditingCompetition({...editingCompetition, certificateFile: file})}
-                    onFileRemove={() => setEditingCompetition({...editingCompetition, certificateFile: null})}
+                    onFileRemove={() => setEditingCompetition({...editingCompetition, certificateFile: undefined})}
                   />
                 </div>
 

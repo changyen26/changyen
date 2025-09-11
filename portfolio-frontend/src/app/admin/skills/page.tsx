@@ -38,7 +38,7 @@ export default function SkillsPage() {
       const skillData = await adminApi.getSkills();
       setSkills(skillData || []);
     } catch {
-      console.error('Failed to load skills:', error);
+      console.error('Failed to load skills:');
     }
   };
 

@@ -32,7 +32,7 @@ export default function ProjectsPage() {
       const projectData = await adminApi.getProjects();
       setProjects(projectData || []);
     } catch {
-      console.error('Failed to load projects:', error);
+      console.error('Failed to load projects:');
     }
   };
 

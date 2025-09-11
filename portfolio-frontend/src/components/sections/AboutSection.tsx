@@ -52,7 +52,7 @@ export default function AboutSection() {
     email: "changyen26@gmail.com",
     phone: "+886 912 345 678",
     title: "全端開發工程師",
-    bio: "專精於現代化網頁開發，擁有豐富的前端和後端開發經驗",
+    description: "專精於現代化網頁開發，擁有豐富的前端和後端開發經驗",
     github: "https://github.com/changyen26",
     linkedin: "https://linkedin.com/in/changyen",
     avatar: "",
@@ -213,7 +213,7 @@ export default function AboutSection() {
               
               <div>
                 <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                  {userInfo.bio}
+                  {userInfo.description}
                 </p>
                 
                 <p className="text-gray-600 leading-relaxed mb-8">

@@ -289,7 +289,7 @@ export default function AnalyticsPage() {
                 <Card className="p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">最近瀏覽</h2>
                   <div className="space-y-3 max-h-80 overflow-y-auto">
-                    {recentViews?.recentViews?.length > 0 ? (
+                    {recentViews && recentViews.recentViews && recentViews.recentViews.length > 0 ? (
                       recentViews.recentViews.slice(0, 10).map((view) => (
                         <div key={view.id} className="flex items-start justify-between border-b border-gray-100 pb-2">
                           <div className="flex-1 min-w-0">
