@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { logger } from '../../lib/logger';
 import { Calendar, Award, FileText, Filter } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatDate } from '../../lib/utils';
@@ -21,9 +22,9 @@ export default function PatentsSection() {
       try {
         // 暫時使用 mockPatents，直到後端 Patent API 完成
         setPatents(mockPatents);
-        console.log('PatentsSection loaded patents data:', mockPatents);
+        logger.log('PatentsSection loaded patents data:', mockPatents);
       } catch (error) {
-        console.error('Failed to load patents:', error);
+        logger.error('Failed to load patents:', error);
         setPatents(mockPatents);
       }
     };

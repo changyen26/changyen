@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, Mail, Phone } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { gsap } from 'gsap';
 import { UserInfo } from '../../types/admin';
 import { adminApi } from '../../lib/adminApi';
+import { logger } from '../../lib/logger';
 import Button from '../common/Button';
 import TypewriterText from '../animations/TypewriterText';
 import MagneticButton from '../animations/MagneticButton';
@@ -15,7 +16,7 @@ export default function HeroSection() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const [userInfo, setUserInfo] = useState<UserInfo>({
-    name: "張智強",
+    name: "謝長諺",
     email: "changyen26@gmail.com",
     phone: "+886 912 345 678",
     title: "全端開發工程師",
@@ -32,12 +33,12 @@ export default function HeroSection() {
     const loadUserData = async () => {
       try {
         const userData = await adminApi.getUserInfo();
-        console.log('HeroSection loaded user data:', userData);
+        logger.log('HeroSection loaded user data:', userData);
         if (userData) {
           setUserInfo(userData);
         }
       } catch (error) {
-        console.error('Failed to load user info in HeroSection:', error);
+        logger.error('Failed to load user info in HeroSection:', error);
       }
     };
 
@@ -203,29 +204,6 @@ export default function HeroSection() {
             </Button>
           </MagneticButton>
 
-          <div className="flex gap-4">
-            <MagneticButton strength={0.2}>
-              <motion.a
-                href={`mailto:${userInfo.email}`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200/50"
-              >
-                <Mail size={20} className="text-gray-700" />
-              </motion.a>
-            </MagneticButton>
-            
-            <MagneticButton strength={0.2}>
-              <motion.a
-                href={`tel:${userInfo.phone}`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200/50"
-              >
-                <Phone size={20} className="text-gray-700" />
-              </motion.a>
-            </MagneticButton>
-          </div>
         </motion.div>
 
         <motion.div

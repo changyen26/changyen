@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { logger } from '../../lib/logger';
 import { motion } from 'framer-motion';
 import { FileData } from '../../types/admin';
 import { adminApi } from '../../lib/adminApi';
@@ -49,7 +50,7 @@ export default function FileUpload({
         throw new Error('上傳失敗');
       }
     } catch (error) {
-      console.error('File upload error:', error);
+      logger.error('File upload error:', error);
       alert(error instanceof Error ? error.message : '文件上傳失敗');
     } finally {
       setIsUploading(false);

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { logger } from '../../lib/logger';
 import { Newspaper, Calendar, ExternalLink, Eye } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { mockNews } from '../../data/mockData';
@@ -26,7 +27,7 @@ export default function NewsSection() {
         //   setNews(newsData);
         // }
       } catch (error) {
-        console.error('Failed to load news:', error);
+        logger.error('Failed to load news:', error);
         setNews(mockNews);
       }
     };

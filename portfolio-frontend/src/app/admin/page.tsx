@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '../../lib/logger';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Button from '../../components/common/Button';
@@ -50,7 +51,7 @@ export default function AdminPage() {
       setUserInfo(info);
       setEditingInfo(info);
     } catch {
-      console.error('Failed to load user info:');
+      logger.error('Failed to load user info:');
     }
   };
 

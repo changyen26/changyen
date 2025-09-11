@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '../../../lib/logger';
 import { motion } from 'framer-motion';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
@@ -32,7 +33,7 @@ export default function ProjectsPage() {
       const projectData = await adminApi.getProjects();
       setProjects(projectData || []);
     } catch {
-      console.error('Failed to load projects:');
+      logger.error('Failed to load projects:');
     }
   };
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '../../../lib/logger';
 import { motion } from 'framer-motion';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
@@ -38,7 +39,7 @@ export default function SkillsPage() {
       const skillData = await adminApi.getSkills();
       setSkills(skillData || []);
     } catch {
-      console.error('Failed to load skills:');
+      logger.error('Failed to load skills:');
     }
   };
 

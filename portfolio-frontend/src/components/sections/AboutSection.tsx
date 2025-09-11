@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Code, Lightbulb, Users, Target, Mail, Phone } from 'lucide-react';
+import { Code, Lightbulb, Users, Target, Mail } from 'lucide-react';
 import { useInView } from '../../hooks/useInView';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import { Skill, UserInfo } from '../../types/admin';
 import { adminApi } from '../../lib/adminApi';
+import { logger } from '../../lib/logger';
 
 // 技能分類顏色映射
 const categoryColors: Record<string, string> = {
@@ -48,10 +49,10 @@ export default function AboutSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });
   const [skills, setSkills] = useState<Skill[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo>({
-    name: "張智強",
+    name: "謝長諺",
     email: "changyen26@gmail.com",
     phone: "+886 912 345 678",
-    title: "全端開發工程師",
+    title: "全端工程師",
     description: "專精於現代化網頁開發，擁有豐富的前端和後端開發經驗",
     github: "https://github.com/changyen26",
     linkedin: "https://linkedin.com/in/changyen",
@@ -65,7 +66,7 @@ export default function AboutSection() {
       // 載入技能資料
       try {
         const skillsData = await adminApi.getSkills();
-        console.log('AboutSection loaded skills data:', skillsData);
+        logger.log('AboutSection loaded skills data:', skillsData);
         if (skillsData && skillsData.length > 0) {
           setSkills(skillsData);
         } else {
@@ -73,7 +74,7 @@ export default function AboutSection() {
           const storedSkills = localStorage.getItem('portfolio_skills');
           if (storedSkills) {
             const parsedSkills = JSON.parse(storedSkills);
-            console.log('Using stored skills:', parsedSkills);
+            logger.log('Using stored skills:', parsedSkills);
             setSkills(parsedSkills);
           } else {
             // 如果都沒有，使用預設技能
@@ -88,12 +89,12 @@ export default function AboutSection() {
           }
         }
       } catch (error) {
-        console.error('Failed to load skills:', error);
+        logger.error('Failed to load skills:', error);
         // 嘗試從 localStorage 獲取技能數據
         const storedSkills = localStorage.getItem('portfolio_skills');
         if (storedSkills) {
           const parsedSkills = JSON.parse(storedSkills);
-          console.log('Using stored skills after error:', parsedSkills);
+          logger.log('Using stored skills after error:', parsedSkills);
           setSkills(parsedSkills);
         }
       }
@@ -101,12 +102,12 @@ export default function AboutSection() {
       // 載入用戶資料
       try {
         const userData = await adminApi.getUserInfo();
-        console.log('AboutSection loaded user data:', userData);
+        logger.log('AboutSection loaded user data:', userData);
         if (userData) {
           setUserInfo(userData);
         }
       } catch (error) {
-        console.error('Failed to load user info:', error);
+        logger.error('Failed to load user info:', error);
         // 保持預設用戶資料
       }
     };
@@ -187,7 +188,7 @@ export default function AboutSection() {
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{userInfo.name}</h3>
                   <p className="text-lg text-gray-600 mb-6">{userInfo.title}</p>
                   
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <div className="flex justify-center lg:justify-start">
                     <motion.a
                       href={`mailto:${userInfo.email}`}
                       className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
@@ -196,16 +197,6 @@ export default function AboutSection() {
                     >
                       <Mail size={16} />
                       <span className="text-sm">{userInfo.email}</span>
-                    </motion.a>
-                    
-                    <motion.a
-                      href={`tel:${userInfo.phone}`}
-                      className="flex items-center justify-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Phone size={16} />
-                      <span className="text-sm">{userInfo.phone}</span>
                     </motion.a>
                   </div>
                 </div>

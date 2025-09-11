@@ -2,7 +2,7 @@ import { User, Patent, Competition, NewsArticle } from '@/types';
 
 export const mockUser: User = {
   id: 1,
-  name: "張智強",
+  name: "謝長諺",
   title: "創新研發工程師 & 競賽達人",
   email: "zhangzhiqiang@email.com",
   phone: "+886 912-345-678",

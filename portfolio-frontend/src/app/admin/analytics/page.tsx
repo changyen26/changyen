@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '../../../lib/logger';
 import { motion } from 'framer-motion';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
@@ -37,7 +38,7 @@ export default function AnalyticsPage() {
       const data = await adminApi.getAnalytics(selectedDays);
       setAnalytics(data);
     } catch {
-      console.error('Failed to load analytics:');
+      logger.error('Failed to load analytics:');
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +49,7 @@ export default function AnalyticsPage() {
       const data = await adminApi.getRecentViews(20);
       setRecentViews(data);
     } catch {
-      console.error('Failed to load recent views:');
+      logger.error('Failed to load recent views:');
     }
   };
 

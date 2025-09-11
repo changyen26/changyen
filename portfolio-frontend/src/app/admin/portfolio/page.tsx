@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '../../../lib/logger';
 import { motion } from 'framer-motion';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
@@ -30,7 +31,7 @@ export default function PortfolioPreviewPage() {
       setProjects(projectsData || []);
       setSkills(skillsData || []);
     } catch {
-      console.error('Failed to load data:');
+      logger.error('Failed to load data:');
     } finally {
       setIsLoading(false);
     }

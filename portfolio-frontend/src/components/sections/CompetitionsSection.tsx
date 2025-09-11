@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '../../lib/logger';
 import { motion } from 'framer-motion';
 import { Trophy, Calendar, Medal, ExternalLink } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
@@ -23,7 +24,7 @@ export default function CompetitionsSection() {
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setCompetitions(featuredCompetitions || []);
       } catch (error) {
-        console.error('Failed to load competitions:', error);
+        logger.error('Failed to load competitions:', error);
         setCompetitions([]);
       }
     };

@@ -1,5 +1,6 @@
 // 流量分析工具
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from './logger';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -119,9 +120,9 @@ class AnalyticsAPI {
       }
 
       const result = await response.json();
-      console.log('📊 頁面瀏覽記錄成功:', result);
+      logger.log('📊 頁面瀏覽記錄成功:', result);
     } catch (error) {
-      console.error('❌ 頁面瀏覽記錄失敗:', error);
+      logger.error('❌ 頁面瀏覽記錄失敗:', error);
       // 不要拋出錯誤，以免影響使用者體驗
     }
   }
@@ -188,7 +189,7 @@ export class PageViewTracker {
   static stopTracking(): void {
     if (this.startTime > 0) {
       const duration = Math.round((Date.now() - this.startTime) / 1000);
-      console.log(`📊 頁面停留時間: ${duration}秒`, this.currentPath);
+      logger.log(`📊 頁面停留時間: ${duration}秒`, this.currentPath);
       this.startTime = 0;
       this.currentPath = '';
     }
@@ -240,7 +241,7 @@ export class AutoTracker {
       }
     });
 
-    console.log('📊 自動流量追蹤已啟用');
+    logger.log('📊 自動流量追蹤已啟用');
   }
 
   /**
@@ -249,7 +250,7 @@ export class AutoTracker {
   static disable(): void {
     this.isEnabled = false;
     PageViewTracker.stopTracking();
-    console.log('📊 自動流量追蹤已停用');
+    logger.log('📊 自動流量追蹤已停用');
   }
 }
 

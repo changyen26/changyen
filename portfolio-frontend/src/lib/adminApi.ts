@@ -1,5 +1,6 @@
 // 管理後台API功能
 import { UserInfo, Project, Skill, Competition, Patent, FileData } from '../types/admin';
+import { logger } from './logger';
 
 // 分析數據介面
 interface AnalyticsData {
@@ -82,28 +83,28 @@ class AdminApiService {
     try {
       // 優先讀取本地存儲的最新數據
       const stored = localStorage.getItem(this.STORAGE_KEYS.USER_INFO);
-      console.log('localStorage user data:', stored);
+      logger.log('localStorage user data:', stored);
       if (stored) {
         const userData = JSON.parse(stored);
-        console.log('Parsed localStorage data:', userData);
+        logger.log('Parsed localStorage data:', userData);
         return userData;
       }
       
       if (API_BASE_URL) {
         // 如果沒有本地數據且有後端API，從後端獲取
         try {
-          console.log('Fetching user data from API:', `${API_BASE_URL}/api/v1/user`);
+          logger.log('Fetching user data from API:', `${API_BASE_URL}/api/v1/user`);
           const response = await fetch(`${API_BASE_URL}/api/v1/user`);
-          console.log('API response status:', response.status, response.ok);
+          logger.log('API response status:', response.status, response.ok);
           if (response.ok) {
             const userData = await response.json();
-            console.log('API returned user data:', userData);
+            logger.log('API returned user data:', userData);
             // 保存到本地存儲作為緩存
             localStorage.setItem(this.STORAGE_KEYS.USER_INFO, JSON.stringify(userData));
             return userData;
           }
         } catch (apiError) {
-          console.log('Backend API failed, using default data:', apiError);
+          logger.log('Backend API failed, using default data:', apiError);
         }
       }
       
@@ -126,7 +127,7 @@ class AdminApiService {
       return defaultData;
       
     } catch (error) {
-      console.error('Failed to get user info:', error);
+      logger.error('Failed to get user info:', error);
       throw error;
     }
   }
@@ -147,15 +148,15 @@ class AdminApiService {
             },
             body: JSON.stringify(userInfo),
           });
-          console.log('Backend update response:', response.ok);
+          logger.log('Backend update response:', response.ok);
         } catch (apiError) {
-          console.log('Backend API failed, but data saved locally:', apiError);
+          logger.log('Backend API failed, but data saved locally:', apiError);
         }
       }
       
       return true; // 總是返回成功，因為本地存儲已保存
     } catch (error) {
-      console.error('Failed to update user info:', error);
+      logger.error('Failed to update user info:', error);
       return false;
     }
   }
@@ -178,7 +179,7 @@ class AdminApiService {
         return password === 'admin123';
       }
     } catch (error) {
-      console.error('Failed to validate password:', error);
+      logger.error('Failed to validate password:', error);
       return false;
     }
   }
@@ -210,7 +211,7 @@ class AdminApiService {
           ]
         };
     } catch (error) {
-      console.error('Failed to get analytics:', error);
+      logger.error('Failed to get analytics:', error);
       throw error;
     }
   }
@@ -243,7 +244,7 @@ class AdminApiService {
         total: 1
       };
     } catch (error) {
-      console.error('Failed to get recent views:', error);
+      logger.error('Failed to get recent views:', error);
       return { recentViews: [], total: 0 };
     }
   }
@@ -259,7 +260,7 @@ class AdminApiService {
         return stored ? JSON.parse(stored) : [];
       }
     } catch (error) {
-      console.error('Failed to get projects:', error);
+      logger.error('Failed to get projects:', error);
       return [];
     }
   }
@@ -286,7 +287,7 @@ class AdminApiService {
         return true;
       }
     } catch (error) {
-      console.error('Failed to create project:', error);
+      logger.error('Failed to create project:', error);
       return false;
     }
   }
@@ -311,7 +312,7 @@ class AdminApiService {
         return false;
       }
     } catch (error) {
-      console.error('Failed to update project:', error);
+      logger.error('Failed to update project:', error);
       return false;
     }
   }
@@ -330,7 +331,7 @@ class AdminApiService {
         return true;
       }
     } catch (error) {
-      console.error('Failed to delete project:', error);
+      logger.error('Failed to delete project:', error);
       return false;
     }
   }
@@ -346,7 +347,7 @@ class AdminApiService {
         return stored ? JSON.parse(stored) : [];
       }
     } catch (error) {
-      console.error('Failed to get skills:', error);
+      logger.error('Failed to get skills:', error);
       return [];
     }
   }
@@ -372,7 +373,7 @@ class AdminApiService {
         return true;
       }
     } catch (error) {
-      console.error('Failed to create skill:', error);
+      logger.error('Failed to create skill:', error);
       return false;
     }
   }
@@ -397,7 +398,7 @@ class AdminApiService {
         return false;
       }
     } catch (error) {
-      console.error('Failed to update skill:', error);
+      logger.error('Failed to update skill:', error);
       return false;
     }
   }
@@ -416,7 +417,7 @@ class AdminApiService {
         return true;
       }
     } catch (error) {
-      console.error('Failed to delete skill:', error);
+      logger.error('Failed to delete skill:', error);
       return false;
     }
   }
@@ -435,7 +436,7 @@ class AdminApiService {
         return stored ? JSON.parse(stored) : [];
       }
     } catch (error) {
-      console.error('Failed to fetch patents:', error);
+      logger.error('Failed to fetch patents:', error);
       return [];
     }
   }
@@ -479,7 +480,7 @@ class AdminApiService {
         return newPatent;
       }
     } catch (error) {
-      console.error('Failed to create patent:', error);
+      logger.error('Failed to create patent:', error);
       return null;
     }
   }
@@ -507,7 +508,7 @@ class AdminApiService {
         return null;
       }
     } catch (error) {
-      console.error('Failed to update patent:', error);
+      logger.error('Failed to update patent:', error);
       return null;
     }
   }
@@ -526,7 +527,7 @@ class AdminApiService {
         return true;
       }
     } catch (error) {
-      console.error('Failed to delete patent:', error);
+      logger.error('Failed to delete patent:', error);
       return false;
     }
   }
@@ -579,7 +580,7 @@ class AdminApiService {
         return fileData;
       }
     } catch (error) {
-      console.error('Failed to upload file:', error);
+      logger.error('Failed to upload file:', error);
       throw error;
     }
   }
@@ -608,7 +609,7 @@ class AdminApiService {
         return stored ? JSON.parse(stored) : [];
       }
     } catch (error) {
-      console.error('Failed to get files:', error);
+      logger.error('Failed to get files:', error);
       return [];
     }
   }
@@ -618,7 +619,7 @@ class AdminApiService {
       const files = await this.getFiles();
       return files.find(file => file.id === id) || null;
     } catch (error) {
-      console.error('Failed to get file:', error);
+      logger.error('Failed to get file:', error);
       return null;
     }
   }
@@ -637,7 +638,7 @@ class AdminApiService {
         return true;
       }
     } catch (error) {
-      console.error('Failed to delete file:', error);
+      logger.error('Failed to delete file:', error);
       return false;
     }
   }
@@ -654,16 +655,16 @@ class AdminApiService {
         const response = await fetch(`${API_BASE_URL}/api/v1/competitions`);
         
         if (!response.ok) {
-          console.error('API Error:', response.status, response.statusText);
+          logger.error('API Error:', response.status, response.statusText);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const apiData = await response.json();
-        console.log('API Response:', apiData);
+        logger.log('API Response:', apiData);
         
         // 確保 apiData 是陣列
         if (!Array.isArray(apiData)) {
-          console.error('Expected array but got:', typeof apiData, apiData);
+          logger.error('Expected array but got:', typeof apiData, apiData);
           return [];
         }
         
@@ -708,7 +709,7 @@ class AdminApiService {
         return stored ? JSON.parse(stored) : [];
       }
     } catch (error) {
-      console.error('Failed to get competitions:', error);
+      logger.error('Failed to get competitions:', error);
       return [];
     }
   }
@@ -729,11 +730,11 @@ class AdminApiService {
 
         // 檢查必填欄位
         if (!competitionData.name) {
-          console.error('Competition name is required but missing:', competition);
+          logger.error('Competition name is required but missing:', competition);
           throw new Error('競賽名稱為必填欄位');
         }
 
-        console.log('Sending competition data to API:', competitionData);
+        logger.log('Sending competition data to API:', competitionData);
         
         const response = await fetch(`${API_BASE_URL}/api/v1/competitions`, {
           method: 'POST',
@@ -743,7 +744,7 @@ class AdminApiService {
         
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('API Error:', response.status, errorText);
+          logger.error('API Error:', response.status, errorText);
           throw new Error(`API Error: ${response.status}`);
         }
         
@@ -762,7 +763,7 @@ class AdminApiService {
         return true;
       }
     } catch (error) {
-      console.error('Failed to create competition:', error);
+      logger.error('Failed to create competition:', error);
       return false;
     }
   }
@@ -788,7 +789,7 @@ class AdminApiService {
           technologies: competition.technologies || []
         };
 
-        console.log('Updating competition data:', competitionData);
+        logger.log('Updating competition data:', competitionData);
         
         const response = await fetch(`${API_BASE_URL}/api/v1/competitions/${competition.id}`, {
           method: 'PUT',
@@ -798,7 +799,7 @@ class AdminApiService {
         
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Update competition API Error:', response.status, errorText);
+          logger.error('Update competition API Error:', response.status, errorText);
         }
         
         return response.ok;
@@ -813,7 +814,7 @@ class AdminApiService {
         return false;
       }
     } catch (error) {
-      console.error('Failed to update competition:', error);
+      logger.error('Failed to update competition:', error);
       return false;
     }
   }
@@ -832,7 +833,7 @@ class AdminApiService {
         return true;
       }
     } catch (error) {
-      console.error('Failed to delete competition:', error);
+      logger.error('Failed to delete competition:', error);
       return false;
     }
   }
@@ -848,7 +849,7 @@ class AdminApiService {
         return stored ? JSON.parse(stored) : [];
       }
     } catch (error) {
-      console.error('Failed to get news:', error);
+      logger.error('Failed to get news:', error);
       return [];
     }
   }
@@ -875,7 +876,7 @@ class AdminApiService {
         return true;
       }
     } catch (error) {
-      console.error('Failed to create news:', error);
+      logger.error('Failed to create news:', error);
       return false;
     }
   }

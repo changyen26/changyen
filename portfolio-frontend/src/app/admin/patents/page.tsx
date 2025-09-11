@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '../../../lib/logger';
 import { motion } from 'framer-motion';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
@@ -69,7 +70,7 @@ export default function PatentsPage() {
       const data = await adminApi.getPatents();
       setPatents(data);
     } catch (error) {
-      console.error('獲取專利失敗:', error);
+      logger.error('獲取專利失敗:', error);
     } finally {
       setLoading(false);
     }
@@ -93,7 +94,7 @@ export default function PatentsPage() {
         setIsEditing(false);
       }
     } catch (error) {
-      console.error('保存專利失敗:', error);
+      logger.error('保存專利失敗:', error);
     } finally {
       setLoading(false);
     }
@@ -120,7 +121,7 @@ export default function PatentsPage() {
         await fetchPatents();
       }
     } catch (error) {
-      console.error('刪除專利失敗:', error);
+      logger.error('刪除專利失敗:', error);
     } finally {
       setLoading(false);
     }

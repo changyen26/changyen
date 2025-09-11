@@ -191,7 +191,7 @@ def fix_database_schema():
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             default_user_data = (
-                "張智強",
+                "謝長諺",
                 "changyen26@gmail.com", 
                 "+886 912 345 678",
                 "全端開發工程師",
