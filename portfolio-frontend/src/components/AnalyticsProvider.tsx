@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useAutoTracking } from '@/hooks/useAnalytics';
+import { useAutoTracking } from '../hooks/useAnalytics';
 
 interface AnalyticsProviderProps {
   children: React.ReactNode;

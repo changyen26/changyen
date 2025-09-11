@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Code, Lightbulb, Users, Target, Mail, Phone } from 'lucide-react';
-import { useInView } from '@/hooks/useInView';
-import Card from '@/components/common/Card';
-import Button from '@/components/common/Button';
-import { Skill, UserInfo } from '@/types/admin';
-import { adminApi } from '@/lib/adminApi';
+import { useInView } from '../../hooks/useInView';
+import Card from '../common/Card';
+import Button from '../common/Button';
+import { Skill, UserInfo } from '../../types/admin';
+import { adminApi } from '../../lib/adminApi';
 
 // 技能分類顏色映射
 const categoryColors: Record<string, string> = {

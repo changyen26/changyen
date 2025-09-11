@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { throttle } from '@/lib/utils';
+import { throttle } from '../lib/utils';
 
 interface ScrollState {
   scrollY: number;

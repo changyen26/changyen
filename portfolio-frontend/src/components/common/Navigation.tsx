@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
-import { useScroll } from '@/hooks/useScroll';
-import { cn } from '@/lib/utils';
+import { useScroll } from '../../hooks/useScroll';
+import { cn } from '../../lib/utils';
 import Button from './Button';
 
 const navItems = [
