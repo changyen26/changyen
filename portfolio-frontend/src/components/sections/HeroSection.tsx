@@ -1,0 +1,204 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { ChevronDown, Mail, Phone } from 'lucide-react';
+import { gsap } from 'gsap';
+import { mockUser } from '@/data/mockData';
+import Button from '@/components/common/Button';
+import TypewriterText from '@/components/animations/TypewriterText';
+import MagneticButton from '@/components/animations/MagneticButton';
+import ParallaxBackground from '@/components/animations/ParallaxBackground';
+
+export default function HeroSection() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline();
+      
+      // 背景動畫
+      gsap.to(heroRef.current, {
+        backgroundPosition: '50% 0%',
+        duration: 20,
+        repeat: -1,
+        yoyo: true,
+        ease: 'none'
+      });
+
+      // 文字動畫
+      if (titleRef.current) {
+        const titleChars = titleRef.current.textContent?.split('') || [];
+        titleRef.current.innerHTML = titleChars.map(char => 
+          `<span class="inline-block">${char === ' ' ? '&nbsp;' : char}</span>`
+        ).join('');
+        
+        tl.from(titleRef.current.children, {
+          opacity: 0,
+          y: 100,
+          rotationX: -90,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: 'back.out(1.7)'
+        });
+      }
+
+      tl.from(subtitleRef.current, {
+        opacity: 0,
+        y: 30,
+        duration: 1,
+        ease: 'power2.out'
+      }, '-=0.3');
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section 
+      id="home" 
+      ref={heroRef}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100"
+      style={{
+        backgroundImage: `
+          radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)
+        `,
+        backgroundSize: '400% 400%'
+      }}
+    >
+      {/* 浮動的幾何形狀 */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full"
+            style={{
+              width: `${Math.random() * 300 + 100}px`,
+              height: `${Math.random() * 300 + 100}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              x: [0, Math.random() * 100 - 50],
+              y: [0, Math.random() * 100 - 50],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: Math.random() * 20 + 10,
+              repeat: Infinity,
+              repeatType: 'reverse',
+              ease: 'linear'
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="mb-8"
+        >
+          <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center text-4xl font-bold text-white shadow-2xl">
+            {mockUser.name.charAt(0)}
+          </div>
+        </motion.div>
+
+        <h1 className="text-6xl md:text-8xl font-bold text-gray-900 mb-6 leading-tight">
+          <TypewriterText 
+            text={mockUser.name}
+            delay={500}
+            speed={100}
+            showCursor={false}
+          />
+        </h1>
+
+        <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <TypewriterText 
+            text={mockUser.title}
+            delay={2000}
+            speed={50}
+            showCursor={false}
+          />
+        </p>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 1 }}
+          className="text-lg text-gray-500 mb-12 max-w-3xl mx-auto"
+        >
+          {mockUser.bio}
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 1.2 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+        >
+          <MagneticButton strength={0.3}>
+            <Button 
+              size="lg" 
+              className="group"
+              onClick={() => document.getElementById('patents')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              查看我的作品
+              <motion.div
+                className="ml-2"
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                →
+              </motion.div>
+            </Button>
+          </MagneticButton>
+
+          <div className="flex gap-4">
+            <MagneticButton strength={0.2}>
+              <motion.a
+                href={`mailto:${mockUser.email}`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200/50"
+              >
+                <Mail size={20} className="text-gray-700" />
+              </motion.a>
+            </MagneticButton>
+            
+            <MagneticButton strength={0.2}>
+              <motion.a
+                href={`tel:${mockUser.phone}`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200/50"
+              >
+                <Phone size={20} className="text-gray-700" />
+              </motion.a>
+            </MagneticButton>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 2 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        >
+          <motion.button
+            onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-200"
+          >
+            <ChevronDown size={24} className="text-gray-600" />
+          </motion.button>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
