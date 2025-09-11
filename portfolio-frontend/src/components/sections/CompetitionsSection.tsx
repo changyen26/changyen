@@ -221,21 +221,21 @@ export default function CompetitionsSection() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div>
                 <div className="text-3xl font-bold text-yellow-600 mb-2">
-                  {competitions.filter(c => c.result.includes('冠軍') || c.result.includes('金') || c.result.includes('1')).length}
+                  {competitions.filter(c => c.result && (c.result.includes('冠軍') || c.result.includes('金') || c.result.includes('1'))).length}
                 </div>
                 <div className="text-gray-600">金獎</div>
               </div>
               
               <div>
                 <div className="text-3xl font-bold text-gray-600 mb-2">
-                  {competitions.filter(c => c.result.includes('亞軍') || c.result.includes('銀') || c.result.includes('2')).length}
+                  {competitions.filter(c => c.result && (c.result.includes('亞軍') || c.result.includes('銀') || c.result.includes('2'))).length}
                 </div>
                 <div className="text-gray-600">銀獎</div>
               </div>
               
               <div>
                 <div className="text-3xl font-bold text-orange-600 mb-2">
-                  {competitions.filter(c => c.result.includes('季軍') || c.result.includes('銅') || c.result.includes('3')).length}
+                  {competitions.filter(c => c.result && (c.result.includes('季軍') || c.result.includes('銅') || c.result.includes('3'))).length}
                 </div>
                 <div className="text-gray-600">銅獎</div>
               </div>
