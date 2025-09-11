@@ -1,0 +1,22 @@
+{
+  "services": {
+    "portfolio-backend": {
+      "path": "./portfolio-backend",
+      "type": "python",
+      "env": {
+        "PYTHONPATH": "/opt/zeabur/src",
+        "PORT": "8000"
+      },
+      "buildCommand": "pip install -r requirements.txt",
+      "startCommand": "python main.py"
+    },
+    "portfolio-frontend": {
+      "path": "./portfolio-frontend", 
+      "type": "nextjs",
+      "buildCommand": "npm install && npm run build",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}

@@ -37,14 +37,16 @@ class Config:
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB 最大文件大小
     
-    # CORS 配置
+    # CORS 配置 - 包含本地和線上域名
     CORS_ORIGINS = [
         'http://localhost:3000',
-        'http://localhost:3001',
+        'http://localhost:3001', 
         'http://localhost:3004',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:3001',
-        'http://127.0.0.1:3004'
+        'http://127.0.0.1:3004',
+        'https://*.zeabur.app',  # Zeabur 域名
+        'https://*.vercel.app',  # 如果使用 Vercel
     ]
 
 class DevelopmentConfig(Config):
@@ -65,5 +67,5 @@ class ProductionConfig(Config):
 config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
-    'default': DevelopmentConfig
+    'default': ProductionConfig
 }
