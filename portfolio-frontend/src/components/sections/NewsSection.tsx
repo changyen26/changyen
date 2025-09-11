@@ -3,12 +3,12 @@
 import { motion } from 'framer-motion';
 import { Newspaper, Calendar, ExternalLink, Eye } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { mockNews } from '@/data/mockData';
-import { formatDate } from '@/lib/utils';
-import { useInView } from '@/hooks/useInView';
-import Card from '@/components/common/Card';
-import Button from '@/components/common/Button';
-import { NewsArticle } from '@/types';
+import { mockNews } from '../../data/mockData';
+import { formatDate } from '../../lib/utils';
+import { useInView } from '../../hooks/useInView';
+import Card from '../common/Card';
+import Button from '../common/Button';
+import { NewsArticle } from '../../types';
 
 export default function NewsSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });

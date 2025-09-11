@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Mail, Phone } from 'lucide-react';
 import { gsap } from 'gsap';
-import { UserInfo } from '@/types/admin';
-import { adminApi } from '@/lib/adminApi';
-import Button from '@/components/common/Button';
-import TypewriterText from '@/components/animations/TypewriterText';
-import MagneticButton from '@/components/animations/MagneticButton';
+import { UserInfo } from '../../types/admin';
+import { adminApi } from '../../lib/adminApi';
+import Button from '../common/Button';
+import TypewriterText from '../animations/TypewriterText';
+import MagneticButton from '../animations/MagneticButton';
 
 export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);

@@ -3,9 +3,9 @@
 import { motion } from 'framer-motion';
 import { Calendar, Award, FileText, Filter } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { formatDate } from '@/lib/utils';
-import { useInView } from '@/hooks/useInView';
-import Card from '@/components/common/Card';
+import { formatDate } from '../../lib/utils';
+import { useInView } from '../../hooks/useInView';
+import Card from '../common/Card';
 import { Patent } from '@/types';
 import { mockPatents } from '@/data/mockData';
 

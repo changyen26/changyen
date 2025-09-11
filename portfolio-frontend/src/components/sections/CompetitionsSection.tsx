@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Calendar, Medal, ExternalLink } from 'lucide-react';
-import { formatDate } from '@/lib/utils';
-import { useInView } from '@/hooks/useInView';
-import Card from '@/components/common/Card';
-import { Competition } from '@/types/admin';
-import { adminApi } from '@/lib/adminApi';
+import { formatDate } from '../../lib/utils';
+import { useInView } from '../../hooks/useInView';
+import Card from '../common/Card';
+import { Competition } from '../../types/admin';
+import { adminApi } from '../../lib/adminApi';
 
 export default function CompetitionsSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });
