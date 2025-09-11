@@ -33,6 +33,7 @@ class User(db.Model):
     projects = db.relationship('Project', backref='user', lazy=True)
     skills = db.relationship('Skill', backref='user', lazy=True)
     news = db.relationship('News', backref='user', lazy=True)
+    patents = db.relationship('Patent', backref='user', lazy=True)
     
     def to_dict(self):
         return {
@@ -283,4 +284,62 @@ class VisitorSession(db.Model):
             'totalPageViews': self.total_page_views,
             'totalTimeSpent': self.total_time_spent,
             'isUnique': self.is_unique
+        }
+
+class Patent(db.Model):
+    """專利模型"""
+    __tablename__ = 'patents'
+    
+    id = db.Column(db.String(36), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    title = db.Column(db.String(200), nullable=False)
+    patent_number = db.Column(db.String(100))  # 專利號碼
+    description = db.Column(db.Text)
+    category = db.Column(db.String(100), default='發明專利')  # 發明專利、新型專利、外觀設計專利
+    status = db.Column(db.String(50), default='審查中')  # 審查中、已核准、已公開、已駁回
+    filing_date = db.Column(db.Date)  # 申請日期
+    grant_date = db.Column(db.Date)   # 核准日期
+    publication_date = db.Column(db.Date)  # 公開日期
+    inventors = db.Column(db.Text)    # 發明人 (JSON字符串)
+    assignee = db.Column(db.String(200))  # 專利權人
+    country = db.Column(db.String(50), default='台灣')  # 申請國家
+    patent_url = db.Column(db.String(255))  # 專利文件連結
+    priority_date = db.Column(db.Date)  # 優先權日期
+    classification = db.Column(db.String(100))  # 國際分類號
+    featured = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def get_inventors(self):
+        """獲取發明人列表"""
+        if self.inventors:
+            try:
+                return json.loads(self.inventors)
+            except:
+                return []
+        return []
+    
+    def set_inventors(self, inventor_list):
+        """設置發明人列表"""
+        self.inventors = json.dumps(inventor_list) if inventor_list else '[]'
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'patentNumber': self.patent_number,
+            'description': self.description,
+            'category': self.category,
+            'status': self.status,
+            'filingDate': self.filing_date.isoformat() if self.filing_date else None,
+            'grantDate': self.grant_date.isoformat() if self.grant_date else None,
+            'publicationDate': self.publication_date.isoformat() if self.publication_date else None,
+            'inventors': self.get_inventors(),
+            'assignee': self.assignee,
+            'country': self.country,
+            'patentUrl': self.patent_url,
+            'priorityDate': self.priority_date.isoformat() if self.priority_date else None,
+            'classification': self.classification,
+            'featured': self.featured,
+            'createdAt': self.created_at.isoformat() if self.created_at else None
         }

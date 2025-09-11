@@ -15,7 +15,7 @@ import base64
 import re
 from config import config
 from models import (
-    db, User, Competition, Project, Skill, News, UploadedFile, PageView, VisitorSession
+    db, User, Competition, Project, Skill, News, Patent, UploadedFile, PageView, VisitorSession
 )
 
 def parse_user_agent(user_agent):
@@ -453,6 +453,227 @@ def register_routes(app):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": f"創建技能失敗: {str(e)}"}), 500
+    
+    @app.route('/api/v1/skills/<skill_id>', methods=['PUT'])
+    def update_skill(skill_id):
+        """更新技能"""
+        try:
+            skill = Skill.query.get(skill_id)
+            if not skill:
+                return jsonify({"error": "技能不存在"}), 404
+            
+            data = request.get_json()
+            
+            # 更新技能資料
+            if 'name' in data:
+                skill.name = data['name']
+            if 'level' in data:
+                skill.level = data['level']
+            if 'category' in data:
+                skill.category = data['category']
+            if 'icon' in data:
+                skill.icon = data['icon']
+            
+            db.session.commit()
+            return jsonify(skill.to_dict())
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"更新技能失敗: {str(e)}"}), 500
+    
+    @app.route('/api/v1/skills/<skill_id>', methods=['DELETE'])
+    def delete_skill(skill_id):
+        """刪除技能"""
+        try:
+            skill = Skill.query.get(skill_id)
+            if not skill:
+                return jsonify({"error": "技能不存在"}), 404
+            
+            db.session.delete(skill)
+            db.session.commit()
+            
+            return jsonify({"message": "技能已刪除"})
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"刪除技能失敗: {str(e)}"}), 500
+
+    # ===== 專利管理 =====
+    @app.route('/api/v1/patents', methods=['GET'])
+    def get_patents():
+        """獲取所有專利"""
+        try:
+            patents = Patent.query.order_by(Patent.created_at.desc()).all()
+            return jsonify([patent.to_dict() for patent in patents])
+        except Exception as e:
+            return jsonify({"error": f"獲取專利失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/patents', methods=['POST'])
+    def create_patent():
+        """創建新專利"""
+        try:
+            data = request.get_json()
+            
+            # 創建新專利
+            patent = Patent()
+            patent.id = str(uuid.uuid4())
+            patent.user_id = 1  # 默認用戶ID
+            patent.title = data.get('title', '')
+            patent.patent_number = data.get('patentNumber', '')
+            patent.description = data.get('description', '')
+            patent.category = data.get('category', '發明專利')
+            patent.status = data.get('status', '審查中')
+            patent.assignee = data.get('assignee', '')
+            patent.country = data.get('country', '台灣')
+            patent.patent_url = data.get('patentUrl', '')
+            patent.classification = data.get('classification', '')
+            patent.featured = data.get('featured', False)
+            
+            # 處理日期欄位
+            if data.get('filingDate'):
+                try:
+                    patent.filing_date = datetime.strptime(data['filingDate'], '%Y-%m-%d').date()
+                except:
+                    pass
+            
+            if data.get('grantDate'):
+                try:
+                    patent.grant_date = datetime.strptime(data['grantDate'], '%Y-%m-%d').date()
+                except:
+                    pass
+                    
+            if data.get('publicationDate'):
+                try:
+                    patent.publication_date = datetime.strptime(data['publicationDate'], '%Y-%m-%d').date()
+                except:
+                    pass
+                    
+            if data.get('priorityDate'):
+                try:
+                    patent.priority_date = datetime.strptime(data['priorityDate'], '%Y-%m-%d').date()
+                except:
+                    pass
+            
+            # 處理發明人列表
+            if data.get('inventors'):
+                patent.set_inventors(data['inventors'])
+            
+            db.session.add(patent)
+            db.session.commit()
+            
+            return jsonify(patent.to_dict()), 201
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"創建專利失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/patents/<patent_id>', methods=['PUT'])
+    def update_patent(patent_id):
+        """更新專利"""
+        try:
+            patent = Patent.query.get(patent_id)
+            if not patent:
+                return jsonify({"error": "專利不存在"}), 404
+            
+            data = request.get_json()
+            
+            # 更新專利資料
+            if 'title' in data:
+                patent.title = data['title']
+            if 'patentNumber' in data:
+                patent.patent_number = data['patentNumber']
+            if 'description' in data:
+                patent.description = data['description']
+            if 'category' in data:
+                patent.category = data['category']
+            if 'status' in data:
+                patent.status = data['status']
+            if 'assignee' in data:
+                patent.assignee = data['assignee']
+            if 'country' in data:
+                patent.country = data['country']
+            if 'patentUrl' in data:
+                patent.patent_url = data['patentUrl']
+            if 'classification' in data:
+                patent.classification = data['classification']
+            if 'featured' in data:
+                patent.featured = data['featured']
+            
+            # 處理日期欄位
+            if 'filingDate' in data:
+                if data['filingDate']:
+                    try:
+                        patent.filing_date = datetime.strptime(data['filingDate'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                else:
+                    patent.filing_date = None
+            
+            if 'grantDate' in data:
+                if data['grantDate']:
+                    try:
+                        patent.grant_date = datetime.strptime(data['grantDate'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                else:
+                    patent.grant_date = None
+                    
+            if 'publicationDate' in data:
+                if data['publicationDate']:
+                    try:
+                        patent.publication_date = datetime.strptime(data['publicationDate'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                else:
+                    patent.publication_date = None
+                    
+            if 'priorityDate' in data:
+                if data['priorityDate']:
+                    try:
+                        patent.priority_date = datetime.strptime(data['priorityDate'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                else:
+                    patent.priority_date = None
+            
+            # 處理發明人列表
+            if 'inventors' in data:
+                patent.set_inventors(data['inventors'])
+            
+            db.session.commit()
+            return jsonify(patent.to_dict())
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"更新專利失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/patents/<patent_id>', methods=['DELETE'])
+    def delete_patent(patent_id):
+        """刪除專利"""
+        try:
+            patent = Patent.query.get(patent_id)
+            if not patent:
+                return jsonify({"error": "專利不存在"}), 404
+            
+            db.session.delete(patent)
+            db.session.commit()
+            
+            return jsonify({"message": "專利已刪除"})
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"刪除專利失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/patents/<patent_id>', methods=['GET'])
+    def get_patent(patent_id):
+        """獲取單個專利"""
+        try:
+            patent = Patent.query.get(patent_id)
+            if not patent:
+                return jsonify({"error": "專利不存在"}), 404
+            return jsonify(patent.to_dict())
+        except Exception as e:
+            return jsonify({"error": f"獲取專利失敗: {str(e)}"}), 500
 
     # ===== 新聞管理 =====
     @app.route('/api/v1/news', methods=['GET'])

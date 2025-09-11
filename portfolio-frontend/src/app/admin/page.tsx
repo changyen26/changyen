@@ -379,7 +379,7 @@ export default function AdminPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
         >
           <Card className="p-6 text-center hover:shadow-lg transition-shadow">
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -446,6 +446,23 @@ export default function AdminPage() {
               onClick={() => window.location.href = '/admin/competitions'}
             >
               管理競賽
+            </Button>
+          </Card>
+
+          <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6M9 3v1m0 16v1m1-10h1m8-1V9a4 4 0 00-8 0v2m0 6h8a2 2 0 002-2v-2a2 2 0 00-2-2H10a2 2 0 00-2 2v2a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">專利管理</h3>
+            <p className="text-gray-600 mb-4">管理專利申請和發明成果</p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.location.href = '/admin/patents'}
+            >
+              管理專利
             </Button>
           </Card>
         </motion.div>

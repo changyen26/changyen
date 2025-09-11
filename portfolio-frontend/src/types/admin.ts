@@ -83,6 +83,26 @@ export interface Competition {
   createdAt: string;
 }
 
+export interface Patent {
+  id: string;
+  title: string;
+  patentNumber?: string; // 專利號碼
+  description?: string;
+  category: string; // 專利類型：發明專利、新型專利、外觀設計專利
+  status: string; // 狀態：審查中、已核准、已公開、已駁回
+  filingDate?: string; // 申請日期
+  grantDate?: string; // 核准日期
+  publicationDate?: string; // 公開日期
+  inventors?: string[]; // 發明人
+  assignee?: string; // 專利權人
+  country: string; // 申請國家
+  patentUrl?: string; // 專利文件連結
+  priorityDate?: string; // 優先權日期
+  classification?: string; // 國際分類號
+  featured: boolean; // 是否為精選專利
+  createdAt?: string;
+}
+
 export interface FileData {
   id: string;
   name: string;

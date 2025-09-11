@@ -1,5 +1,5 @@
 // 管理後台API功能
-import { UserInfo, Project, Skill, Competition, FileData } from '@/types/admin';
+import { UserInfo, Project, Skill, Competition, Patent, FileData } from '../types/admin';
 
 // 分析數據介面
 interface AnalyticsData {
@@ -108,7 +108,7 @@ class AdminApiService {
       
       // 返回默認數據
       const defaultData = {
-        name: '張智強',
+        name: '謝長諺',
         email: 'changyen26@gmail.com',
         phone: '+886 912 345 678',
         title: '全端開發工程師',
@@ -416,6 +416,116 @@ class AdminApiService {
       }
     } catch (error) {
       console.error('Failed to delete skill:', error);
+      return false;
+    }
+  }
+
+  // ===== 專利管理 =====
+  async getPatents(): Promise<Patent[]> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/patents`);
+        if (response.ok) {
+          return await response.json();
+        }
+        return [];
+      } else {
+        const stored = localStorage.getItem(this.STORAGE_KEYS.PATENTS || 'patents');
+        return stored ? JSON.parse(stored) : [];
+      }
+    } catch (error) {
+      console.error('Failed to fetch patents:', error);
+      return [];
+    }
+  }
+
+  async createPatent(patent: Partial<Patent>): Promise<Patent | null> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/patents`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patent),
+        });
+        if (response.ok) {
+          return await response.json();
+        }
+        return null;
+      } else {
+        const newPatent: Patent = {
+          id: Date.now().toString(),
+          title: patent.title || '',
+          patentNumber: patent.patentNumber,
+          description: patent.description,
+          category: patent.category || '發明專利',
+          status: patent.status || '審查中',
+          filingDate: patent.filingDate,
+          grantDate: patent.grantDate,
+          publicationDate: patent.publicationDate,
+          inventors: patent.inventors || [],
+          assignee: patent.assignee,
+          country: patent.country || '台灣',
+          patentUrl: patent.patentUrl,
+          priorityDate: patent.priorityDate,
+          classification: patent.classification,
+          featured: patent.featured || false,
+          createdAt: new Date().toISOString(),
+        };
+
+        const patents = await this.getPatents();
+        patents.push(newPatent);
+        localStorage.setItem('patents', JSON.stringify(patents));
+        return newPatent;
+      }
+    } catch (error) {
+      console.error('Failed to create patent:', error);
+      return null;
+    }
+  }
+
+  async updatePatent(id: string, patent: Partial<Patent>): Promise<Patent | null> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/patents/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patent),
+        });
+        if (response.ok) {
+          return await response.json();
+        }
+        return null;
+      } else {
+        const patents = await this.getPatents();
+        const index = patents.findIndex(p => p.id === id);
+        if (index !== -1) {
+          patents[index] = { ...patents[index], ...patent };
+          localStorage.setItem('patents', JSON.stringify(patents));
+          return patents[index];
+        }
+        return null;
+      }
+    } catch (error) {
+      console.error('Failed to update patent:', error);
+      return null;
+    }
+  }
+
+  async deletePatent(id: string): Promise<boolean> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/patents/${id}`, {
+          method: 'DELETE',
+        });
+        return response.ok;
+      } else {
+        const patents = await this.getPatents();
+        const filtered = patents.filter(p => p.id !== id);
+        localStorage.setItem('patents', JSON.stringify(filtered));
+        return true;
+      }
+    } catch (error) {
+      console.error('Failed to delete patent:', error);
       return false;
     }
   }
