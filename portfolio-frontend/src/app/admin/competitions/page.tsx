@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Button from '@/components/common/Button';
-import Card from '@/components/common/Card';
-import FileUpload from '@/components/common/FileUpload';
-import { Competition } from '@/types/admin';
-import { adminApi } from '@/lib/adminApi';
+import Button from '../../../components/common/Button';
+import Card from '../../../components/common/Card';
+import FileUpload from '../../../components/common/FileUpload';
+import { Competition } from '../../../types/admin';
+import { adminApi } from '../../../lib/adminApi';
 
 const COMPETITION_CATEGORIES = [
   '技術創新',

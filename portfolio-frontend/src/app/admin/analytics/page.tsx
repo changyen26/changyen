@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Button from '@/components/common/Button';
-import Card from '@/components/common/Card';
-import { Analytics } from '@/types/admin';
-import { adminApi } from '@/lib/adminApi';
+import Button from '../../../components/common/Button';
+import Card from '../../../components/common/Card';
+import { Analytics } from '../../../types/admin';
+import { adminApi } from '../../../lib/adminApi';
 
 export default function AnalyticsPage() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
