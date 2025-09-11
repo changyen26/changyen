@@ -1,36 +1,22 @@
-# Multi-stage build for combined frontend + backend deployment
+# Use Python base image for simplicity
+FROM python:3.11-slim
 
-# Stage 1: Build Frontend
-FROM node:18-alpine AS frontend-builder
-WORKDIR /app
-
-# Copy frontend package files
-COPY portfolio-frontend/package.json portfolio-frontend/package-lock.json* ./
-RUN npm ci
-
-# Copy frontend source and build
-COPY portfolio-frontend/ ./
-# Debug: List directory contents
-RUN ls -la 
-RUN ls -la public/
-RUN npm run build
-# Debug: Check build output
-RUN ls -la .next/
-
-# Stage 2: Python Backend with Frontend
-FROM python:3.11-slim AS production
+# Set work directory
 WORKDIR /app
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies
+# Install system dependencies (including Node.js)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gcc \
         default-libmysqlclient-dev \
         pkg-config \
+        curl \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy and install Python dependencies
@@ -40,10 +26,21 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend code
 COPY portfolio-backend/ ./
 
-# Copy built frontend from previous stage
-COPY --from=frontend-builder /app/.next/standalone ./frontend_build/
-COPY --from=frontend-builder /app/.next/static ./frontend_build/.next/static/
-COPY --from=frontend-builder /app/public ./frontend_build/public
+# Copy frontend code and build
+COPY portfolio-frontend/ ./frontend/
+WORKDIR /app/frontend
+RUN npm ci
+RUN npm run build
+
+# Create frontend_build directory and copy built files
+WORKDIR /app
+RUN mkdir -p ./frontend_build
+RUN cp -r ./frontend/.next/standalone/* ./frontend_build/
+RUN cp -r ./frontend/.next/static ./frontend_build/.next/
+RUN cp -r ./frontend/public ./frontend_build/
+
+# Clean up frontend source to save space
+RUN rm -rf ./frontend
 
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
