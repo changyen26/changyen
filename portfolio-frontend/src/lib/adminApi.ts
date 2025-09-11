@@ -70,6 +70,7 @@ class AdminApiService {
     PROJECTS: 'portfolio_projects',
     SKILLS: 'portfolio_skills',
     COMPETITIONS: 'portfolio_competitions',
+    PATENTS: 'portfolio_patents',
     FILES: 'portfolio_files',
     EXPERIENCES: 'portfolio_experiences',
     EDUCATION: 'portfolio_education',
@@ -430,7 +431,7 @@ class AdminApiService {
         }
         return [];
       } else {
-        const stored = localStorage.getItem(this.STORAGE_KEYS.PATENTS || 'patents');
+        const stored = localStorage.getItem(this.STORAGE_KEYS.PATENTS);
         return stored ? JSON.parse(stored) : [];
       }
     } catch (error) {
