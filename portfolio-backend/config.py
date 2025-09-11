@@ -45,8 +45,8 @@ class Config:
         'http://127.0.0.1:3000',
         'http://127.0.0.1:3001',
         'http://127.0.0.1:3004',
-        'https://*.zeabur.app',  # Zeabur 域名
-        'https://*.vercel.app',  # 如果使用 Vercel
+        'https://changyen.zeabur.app',  # 前端正式域名
+        'https://changyen-backend.zeabur.app',  # 後端域名
     ]
 
 class DevelopmentConfig(Config):
