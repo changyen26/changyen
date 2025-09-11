@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
 
 from app.api.api_v1 import api_router
 from app.core.config import settings
@@ -27,11 +29,10 @@ app.add_middleware(
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-
-@app.get("/")
-async def root():
-    return {"message": "Portfolio API is running", "version": "1.0.0"}
-
+# Serve static files and frontend
+frontend_build_path = os.path.join(os.path.dirname(__file__), "..", "..", "frontend_build")
+if os.path.exists(frontend_build_path):
+    app.mount("/", StaticFiles(directory=frontend_build_path, html=True), name="frontend")
 
 @app.get("/health")
 async def health_check():

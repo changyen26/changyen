@@ -6,7 +6,7 @@
 2. 代碼已推送到GitHub：https://github.com/changyen26/changyen
 3. MySQL數據庫已準備就緒
 
-## 📋 部署步驟
+## 📋 部署步驟 (合併部署版本)
 
 ### Step 1: 登入Zeabur控制台
 
@@ -14,20 +14,21 @@
 2. 使用GitHub帳戶登入
 3. 創建新的Project
 
-### Step 2: 部署後端API
+### Step 2: 部署合併服務 (前端+後端)
 
-#### 2.1 新增後端服務
+#### 2.1 新增服務
 
 1. 點擊 **"Add Service"**
 2. 選擇 **"GitHub"**
 3. 授權Zeabur訪問您的GitHub倉庫
 4. 選擇 `changyen26/changyen` 倉庫
-5. 選擇 **"portfolio-backend"** 目錄
+5. 使用根目錄 (不選擇子目錄)
 
-#### 2.2 配置後端環境變數
+#### 2.2 配置環境變數
 
 在服務設置中添加以下環境變數：
 
+**後端配置：**
 ```env
 DATABASE_URL=mysql+pymysql://root:9y76FPMki52d3g0VAclpD8UevTR1zw4Z@sjc1.clusters.zeabur.com:31018/zeabur
 ENVIRONMENT=production
@@ -38,49 +39,31 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 PORT=8000
 ```
 
-#### 2.3 配置CORS設置
-
-等前端部署完成後，更新CORS配置：
-
+**前端配置：**
 ```env
-BACKEND_CORS_ORIGINS=["https://your-frontend-service.zeabur.app"]
-```
-
-### Step 3: 部署前端
-
-#### 3.1 新增前端服務
-
-1. 在同一個Project中點擊 **"Add Service"**
-2. 選擇 **"GitHub"**
-3. 選擇同一個 `changyen26/changyen` 倉庫
-4. 選擇 **"portfolio-frontend"** 目錄
-
-#### 3.2 配置前端環境變數
-
-```env
-NEXT_PUBLIC_API_URL=https://your-backend-service.zeabur.app
+NEXT_PUBLIC_API_URL=/api/v1
 NODE_ENV=production
 ```
 
-> **注意**: 將 `your-backend-service` 替換為您實際的後端服務名稱
+> **注意**: 由於前後端合併部署，CORS配置已經不需要，API URL使用相對路徑
 
-### Step 4: 配置自定義域名 (可選)
+### Step 3: 配置自定義域名 (可選)
 
 1. 在服務設置中點擊 **"Domain"**
 2. 添加自定義域名或使用Zeabur提供的免費域名
 3. 配置DNS記錄 (如使用自定義域名)
 
-### Step 5: 初始化資料庫
+### Step 4: 初始化資料庫
 
-#### 5.1 通過API初始化
+#### 4.1 通過API初始化
 
 部署完成後，訪問以下端點來初始化資料庫：
 
 ```bash
-POST https://your-backend-service.zeabur.app/init-db
+POST https://your-service.zeabur.app/api/v1/init-db
 ```
 
-#### 5.2 手動執行初始化腳本
+#### 4.2 手動執行初始化腳本
 
 如果需要手動初始化，可以使用Zeabur的Terminal功能：
 
@@ -90,37 +73,30 @@ python -m app.utils.init_db
 
 ## 🔍 驗證部署
 
-### 檢查後端API
+### 檢查合併服務
 
-1. 訪問 `https://your-backend-service.zeabur.app`
-2. 檢查API文檔：`https://your-backend-service.zeabur.app/docs`
-3. 健康檢查：`https://your-backend-service.zeabur.app/health`
+1. 訪問 `https://your-service.zeabur.app` - 前端網站
+2. 檢查API文檔：`https://your-service.zeabur.app/docs` - 後端API文檔
+3. 健康檢查：`https://your-service.zeabur.app/health` - 後端健康檢查
+4. API測試：`https://your-service.zeabur.app/api/v1/...` - 後端API端點
 
-### 檢查前端網站
+## 📱 最終URL結構 (合併部署)
 
-1. 訪問 `https://your-frontend-service.zeabur.app`
-2. 確認所有動畫正常工作
-3. 測試API數據載入
-
-## 📱 最終URL結構
-
-- **前端網站**: `https://your-frontend-service.zeabur.app`
-- **後端API**: `https://your-backend-service.zeabur.app`
-- **API文檔**: `https://your-backend-service.zeabur.app/docs`
+- **網站首頁**: `https://your-service.zeabur.app`
+- **後端API**: `https://your-service.zeabur.app/api/v1`
+- **API文檔**: `https://your-service.zeabur.app/docs`
+- **健康檢查**: `https://your-service.zeabur.app/health`
 
 ## 🔧 常見問題排除
 
-### 問題1: CORS錯誤
-**解決方案**: 確保後端的CORS配置包含前端域名
-
-### 問題2: 資料庫連接失敗
+### 問題1: 資料庫連接失敗
 **解決方案**: 檢查環境變數中的DATABASE_URL是否正確
 
-### 問題3: 靜態資源載入失敗
+### 問題2: 靜態資源載入失敗
 **解決方案**: 確保Next.js配置了正確的`output: 'standalone'`
 
-### 問題4: API調用失敗
-**解決方案**: 檢查前端的`NEXT_PUBLIC_API_URL`環境變數
+### 問題3: API調用失敗
+**解決方案**: 檢查前端的`NEXT_PUBLIC_API_URL`環境變數設置為`/api/v1`
 
 ## 🔄 更新部署
 
