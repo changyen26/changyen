@@ -14,12 +14,12 @@ class Config:
     """基礎配置"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     
-    # MySQL 資料庫配置
-    MYSQL_USER = os.environ.get('MYSQL_USER') or 'yen'
-    MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or ''
-    MYSQL_HOST = os.environ.get('MYSQL_HOST') or 'localhost'
-    MYSQL_PORT = os.environ.get('MYSQL_PORT') or '3306'
-    MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE') or 'portfolio'
+    # MySQL 資料庫配置 - 支援多種環境變數命名
+    MYSQL_USER = os.environ.get('MYSQL_USER') or os.environ.get('DB_USER') or 'yen'
+    MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or os.environ.get('DB_PASSWORD') or ''
+    MYSQL_HOST = os.environ.get('MYSQL_HOST') or os.environ.get('DB_HOST') or 'localhost'
+    MYSQL_PORT = os.environ.get('MYSQL_PORT') or os.environ.get('DB_PORT') or '3306'
+    MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE') or os.environ.get('DB_NAME') or 'portfolio'
     
     # SQLAlchemy 配置
     SQLALCHEMY_DATABASE_URI = (
