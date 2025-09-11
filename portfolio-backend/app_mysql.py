@@ -848,9 +848,10 @@ def init_default_data():
         db.session.rollback()
         print(f"[ERROR] 預設資料初始化失敗: {e}")
 
+# 為部署創建全域 app 實例
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
-    
     print("=" * 60)
     print("Portfolio Flask + MySQL API 服務器啟動")
     print(f"服務器地址: http://localhost:8000")
