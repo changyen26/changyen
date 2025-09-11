@@ -26,7 +26,6 @@ export default function TypewriterText({
     if (!text) return;
 
     const timeout = setTimeout(() => {
-      setIsTyping(true);
       let index = 0;
       
       const typeInterval = setInterval(() => {
@@ -34,7 +33,6 @@ export default function TypewriterText({
           setDisplayedText(text.slice(0, index + 1));
           index++;
         } else {
-          setIsTyping(false);
           clearInterval(typeInterval);
           onComplete?.();
         }
