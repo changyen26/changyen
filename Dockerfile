@@ -10,7 +10,12 @@ RUN npm ci
 
 # Copy frontend source and build
 COPY portfolio-frontend/ ./
+# Debug: List directory contents
+RUN ls -la 
+RUN ls -la public/
 RUN npm run build
+# Debug: Check build output
+RUN ls -la .next/
 
 # Stage 2: Python Backend with Frontend
 FROM python:3.11-slim AS production
@@ -38,7 +43,7 @@ COPY portfolio-backend/ ./
 # Copy built frontend from previous stage
 COPY --from=frontend-builder /app/.next/standalone ./frontend_build/
 COPY --from=frontend-builder /app/.next/static ./frontend_build/.next/static/
-COPY --from=frontend-builder /app/public ./frontend_build/public/
+COPY --from=frontend-builder /app/public ./frontend_build/public
 
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
