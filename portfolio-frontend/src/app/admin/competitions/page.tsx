@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Button from '@/components/common/Button';
 import Card from '@/components/common/Card';
 import FileUpload from '@/components/common/FileUpload';
-import { Competition, FileData } from '@/types/admin';
+import { Competition } from '@/types/admin';
 import { adminApi } from '@/lib/adminApi';
 
 const COMPETITION_CATEGORIES = [
@@ -64,7 +64,7 @@ export default function CompetitionsPage() {
     try {
       const competitionData = await adminApi.getCompetitions();
       setCompetitions(competitionData || []);
-    } catch (error) {
+    } catch {
       console.error('Failed to load competitions:', error);
     }
   };
@@ -87,7 +87,7 @@ export default function CompetitionsPage() {
       } else {
         alert('保存失敗，請重試！');
       }
-    } catch (error) {
+    } catch {
       alert('保存失敗，請重試！');
     }
   };
@@ -103,7 +103,7 @@ export default function CompetitionsPage() {
       } else {
         alert('刪除失敗，請重試！');
       }
-    } catch (error) {
+    } catch {
       alert('刪除失敗，請重試！');
     }
   };

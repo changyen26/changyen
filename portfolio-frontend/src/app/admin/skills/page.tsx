@@ -37,7 +37,7 @@ export default function SkillsPage() {
     try {
       const skillData = await adminApi.getSkills();
       setSkills(skillData || []);
-    } catch (error) {
+    } catch {
       console.error('Failed to load skills:', error);
     }
   };
@@ -60,7 +60,7 @@ export default function SkillsPage() {
       } else {
         alert('保存失敗，請重試！');
       }
-    } catch (error) {
+    } catch {
       alert('保存失敗，請重試！');
     }
   };
@@ -76,7 +76,7 @@ export default function SkillsPage() {
       } else {
         alert('刪除失敗，請重試！');
       }
-    } catch (error) {
+    } catch {
       alert('刪除失敗，請重試！');
     }
   };

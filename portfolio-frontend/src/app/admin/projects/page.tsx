@@ -31,7 +31,7 @@ export default function ProjectsPage() {
     try {
       const projectData = await adminApi.getProjects();
       setProjects(projectData || []);
-    } catch (error) {
+    } catch {
       console.error('Failed to load projects:', error);
     }
   };
@@ -54,7 +54,7 @@ export default function ProjectsPage() {
       } else {
         alert('保存失敗，請重試！');
       }
-    } catch (error) {
+    } catch {
       alert('保存失敗，請重試！');
     }
   };
@@ -70,7 +70,7 @@ export default function ProjectsPage() {
       } else {
         alert('刪除失敗，請重試！');
       }
-    } catch (error) {
+    } catch {
       alert('刪除失敗，請重試！');
     }
   };

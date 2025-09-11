@@ -14,6 +14,11 @@ interface AnalyticsData {
     source: string;
     visits: number;
   }[];
+  browsers?: {
+    name: string;
+    count: number;
+    percentage: string;
+  }[];
 }
 
 // 最近瀏覽記錄介面

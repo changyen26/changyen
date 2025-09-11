@@ -127,4 +127,9 @@ export interface Analytics {
     source: string;
     visits: number;
   }[];
+  browsers?: {
+    name: string;
+    count: number;
+    percentage: string;
+  }[];
 }

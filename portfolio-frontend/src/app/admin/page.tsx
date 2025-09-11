@@ -38,7 +38,7 @@ export default function AdminPage() {
       } else {
         alert('密碼錯誤！');
       }
-    } catch (error) {
+    } catch {
       alert('登入失敗，請重試！');
     }
   };
@@ -49,8 +49,8 @@ export default function AdminPage() {
       const info = await adminApi.getUserInfo();
       setUserInfo(info);
       setEditingInfo(info);
-    } catch (error) {
-      console.error('Failed to load user info:', error);
+    } catch {
+      console.error('Failed to load user info:');
     }
   };
 
@@ -80,7 +80,7 @@ export default function AdminPage() {
       } else {
         alert('更新失敗，請重試！');
       }
-    } catch (error) {
+    } catch {
       alert('更新失敗，請重試！');
     }
   };
@@ -172,7 +172,7 @@ export default function AdminPage() {
                   document.body.removeChild(a);
                   URL.revokeObjectURL(url);
                   alert('數據導出成功！');
-                } catch (error) {
+                } catch {
                   alert('導出失敗，請重試！');
                 }
               }}

@@ -36,8 +36,8 @@ export default function AnalyticsPage() {
       setIsLoading(true);
       const data = await adminApi.getAnalytics(selectedDays);
       setAnalytics(data);
-    } catch (error) {
-      console.error('Failed to load analytics:', error);
+    } catch {
+      console.error('Failed to load analytics:');
     } finally {
       setIsLoading(false);
     }
@@ -47,8 +47,8 @@ export default function AnalyticsPage() {
     try {
       const data = await adminApi.getRecentViews(20);
       setRecentViews(data);
-    } catch (error) {
-      console.error('Failed to load recent views:', error);
+    } catch {
+      console.error('Failed to load recent views:');
     }
   };
 
@@ -252,8 +252,8 @@ export default function AnalyticsPage() {
                 <Card className="p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">瀏覽器統計</h2>
                   <div className="space-y-4">
-                    {analytics && (analytics as any).browsers?.length > 0 ? (
-                      (analytics as any).browsers.map((browser: any, index: number) => (
+                    {analytics && analytics.browsers && analytics.browsers.length > 0 ? (
+                      analytics.browsers.map((browser, index) => (
                         <div key={browser.name} className="flex items-center justify-between">
                           <div className="flex items-center">
                             <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
@@ -290,7 +290,7 @@ export default function AnalyticsPage() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">最近瀏覽</h2>
                   <div className="space-y-3 max-h-80 overflow-y-auto">
                     {recentViews?.recentViews?.length > 0 ? (
-                      recentViews.recentViews.slice(0, 10).map((view, index) => (
+                      recentViews.recentViews.slice(0, 10).map((view) => (
                         <div key={view.id} className="flex items-start justify-between border-b border-gray-100 pb-2">
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-gray-900 truncate">{view.title || view.path}</p>
@@ -361,7 +361,7 @@ export default function AnalyticsPage() {
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
                         alert('數據導出成功！');
-                      } catch (error) {
+                      } catch {
                         alert('導出失敗，請重試！');
                       }
                     }}
