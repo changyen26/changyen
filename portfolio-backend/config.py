@@ -41,9 +41,11 @@ class Config:
     CORS_ORIGINS = [
         'http://localhost:3000',
         'http://localhost:3001', 
+        'http://localhost:3002',  # 添加 3002 端口
         'http://localhost:3004',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:3001',
+        'http://127.0.0.1:3002',  # 添加 3002 端口
         'http://127.0.0.1:3004',
         'https://changyen.zeabur.app',  # 前端正式域名
         'https://changyen-backend.zeabur.app',  # 後端域名
