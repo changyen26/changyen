@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { PageViewTracker, AutoTracker } from '@/lib/analytics';
+import { PageViewTracker, AutoTracker } from '../lib/analytics';
 
 /**
  * 自動頁面追蹤Hook

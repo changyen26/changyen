@@ -6,8 +6,8 @@ import { useState, useEffect } from 'react';
 import { formatDate } from '../../lib/utils';
 import { useInView } from '../../hooks/useInView';
 import Card from '../common/Card';
-import { Patent } from '@/types';
-import { mockPatents } from '@/data/mockData';
+import { Patent } from '../../types';
+import { mockPatents } from '../../data/mockData';
 
 const categories = ['全部', '人工智能', '物聯網', '區塊鏈'];
 
