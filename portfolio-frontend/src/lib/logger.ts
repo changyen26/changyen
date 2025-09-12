@@ -10,7 +10,7 @@ class Logger {
   /**
    * 一般信息日誌（僅開發環境）
    */
-  log(...args: any[]) {
+  log(...args: unknown[]) {
     if (isDevelopment) {
       console.log(...args);
     }
@@ -19,7 +19,7 @@ class Logger {
   /**
    * 警告日誌（僅開發環境）
    */
-  warn(...args: any[]) {
+  warn(...args: unknown[]) {
     if (isDevelopment) {
       console.warn(...args);
     }
@@ -28,7 +28,7 @@ class Logger {
   /**
    * 錯誤日誌（所有環境，但在生產環境中不顯示敏感信息）
    */
-  error(...args: any[]) {
+  error(...args: unknown[]) {
     if (isDevelopment) {
       console.error(...args);
     } else {
@@ -40,7 +40,7 @@ class Logger {
   /**
    * 調試日誌（僅開發環境）
    */
-  debug(...args: any[]) {
+  debug(...args: unknown[]) {
     if (isDevelopment) {
       console.debug(...args);
     }
@@ -49,7 +49,7 @@ class Logger {
   /**
    * 信息日誌（僅開發環境）
    */
-  info(...args: any[]) {
+  info(...args: unknown[]) {
     if (isDevelopment) {
       console.info(...args);
     }
@@ -58,7 +58,7 @@ class Logger {
   /**
    * API 調試（僅開發環境）
    */
-  api(method: string, url: string, data?: any) {
+  api(method: string, url: string, data?: unknown) {
     if (isDevelopment) {
       console.log(`🌐 ${method.toUpperCase()} ${url}`, data || '');
     }
@@ -67,7 +67,7 @@ class Logger {
   /**
    * 數據加載日誌（僅開發環境）
    */
-  data(message: string, data?: any) {
+  data(message: string, data?: unknown) {
     if (isDevelopment) {
       console.log(`📊 ${message}`, data || '');
     }
@@ -76,7 +76,7 @@ class Logger {
   /**
    * 成功操作日誌（僅開發環境）
    */
-  success(message: string, data?: any) {
+  success(message: string, data?: unknown) {
     if (isDevelopment) {
       console.log(`✅ ${message}`, data || '');
     }
