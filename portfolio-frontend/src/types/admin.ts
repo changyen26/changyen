@@ -103,6 +103,20 @@ export interface Patent {
   createdAt?: string;
 }
 
+export interface MediaCoverage {
+  id: string;
+  title: string;
+  mediaName: string; // 媒體名稱
+  summary?: string; // 報導摘要
+  articleUrl?: string; // 報導連結
+  imageUrl?: string; // 報導圖片
+  category: string; // 報導類別：新聞報導、專訪、評論等
+  status: string; // 狀態：已發布、草稿、已刪除
+  publicationDate?: string; // 發布日期
+  featured: boolean; // 是否為精選報導
+  createdAt?: string;
+}
+
 export interface FileData {
   id: string;
   name: string;

@@ -15,7 +15,7 @@ import base64
 import re
 from config import config
 from models import (
-    db, User, Competition, Project, Skill, News, Patent, UploadedFile, PageView, VisitorSession
+    db, User, Competition, Project, Skill, News, Patent, MediaCoverage, UploadedFile, PageView, VisitorSession
 )
 
 def parse_user_agent(user_agent):
@@ -674,6 +674,124 @@ def register_routes(app):
             return jsonify(patent.to_dict())
         except Exception as e:
             return jsonify({"error": f"獲取專利失敗: {str(e)}"}), 500
+
+    # ===== 媒體報導管理 =====
+    @app.route('/api/v1/media-coverage', methods=['GET'])
+    def get_media_coverage():
+        """獲取所有媒體報導"""
+        try:
+            media_list = MediaCoverage.query.order_by(MediaCoverage.created_at.desc()).all()
+            return jsonify([media.to_dict() for media in media_list])
+        except Exception as e:
+            return jsonify({"error": f"獲取媒體報導失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/media-coverage', methods=['POST'])
+    def create_media_coverage():
+        """創建新媒體報導"""
+        try:
+            data = request.get_json()
+            
+            # 創建新媒體報導
+            media = MediaCoverage()
+            media.id = str(uuid.uuid4())
+            media.user_id = 1  # 默認用戶ID
+            media.title = data.get('title', '')
+            media.media_name = data.get('mediaName', '')
+            media.summary = data.get('summary', '')
+            media.article_url = data.get('articleUrl', '')
+            media.image_url = data.get('imageUrl', '')
+            media.category = data.get('category', '媒體報導')
+            media.featured = data.get('featured', False)
+            media.status = data.get('status', '已發布')
+            
+            # 處理發布日期
+            if data.get('publicationDate'):
+                try:
+                    media.publication_date = datetime.strptime(data['publicationDate'], '%Y-%m-%d').date()
+                except:
+                    pass
+            
+            db.session.add(media)
+            db.session.commit()
+            
+            return jsonify(media.to_dict()), 201
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"創建媒體報導失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/media-coverage/<media_id>', methods=['PUT'])
+    def update_media_coverage(media_id):
+        """更新媒體報導"""
+        try:
+            media = MediaCoverage.query.get(media_id)
+            if not media:
+                return jsonify({"error": "媒體報導不存在"}), 404
+            
+            data = request.get_json()
+            
+            # 更新媒體報導資料
+            if 'title' in data:
+                media.title = data['title']
+            if 'mediaName' in data:
+                media.media_name = data['mediaName']
+            if 'summary' in data:
+                media.summary = data['summary']
+            if 'articleUrl' in data:
+                media.article_url = data['articleUrl']
+            if 'imageUrl' in data:
+                media.image_url = data['imageUrl']
+            if 'category' in data:
+                media.category = data['category']
+            if 'featured' in data:
+                media.featured = data['featured']
+            if 'status' in data:
+                media.status = data['status']
+            
+            # 處理發布日期
+            if 'publicationDate' in data:
+                if data['publicationDate']:
+                    try:
+                        media.publication_date = datetime.strptime(data['publicationDate'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                else:
+                    media.publication_date = None
+            
+            db.session.commit()
+            return jsonify(media.to_dict())
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"更新媒體報導失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/media-coverage/<media_id>', methods=['DELETE'])
+    def delete_media_coverage(media_id):
+        """刪除媒體報導"""
+        try:
+            media = MediaCoverage.query.get(media_id)
+            if not media:
+                return jsonify({"error": "媒體報導不存在"}), 404
+            
+            db.session.delete(media)
+            db.session.commit()
+            
+            return jsonify({"message": "媒體報導已刪除"})
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"刪除媒體報導失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/media-coverage/<media_id>', methods=['GET'])
+    def get_single_media_coverage(media_id):
+        """獲取單個媒體報導"""
+        try:
+            media = MediaCoverage.query.get(media_id)
+            if not media:
+                return jsonify({"error": "媒體報導不存在"}), 404
+            return jsonify(media.to_dict())
+        except Exception as e:
+            return jsonify({"error": f"獲取媒體報導失敗: {str(e)}"}), 500
 
     # ===== 新聞管理 =====
     @app.route('/api/v1/news', methods=['GET'])

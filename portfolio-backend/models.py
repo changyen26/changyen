@@ -200,6 +200,45 @@ class News(db.Model):
             'createdAt': self.created_at.isoformat() if self.created_at else None
         }
 
+class MediaCoverage(db.Model):
+    """媒體報導模型"""
+    __tablename__ = 'media_coverage'
+    
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    title = db.Column(db.String(200), nullable=False)
+    media_name = db.Column(db.String(100), nullable=False)  # 媒體名稱
+    media_type = db.Column(db.String(50))  # 報導類型：新聞、專訪、報導等
+    publication_date = db.Column(db.Date)  # 發布日期
+    author = db.Column(db.String(100))  # 作者/記者
+    summary = db.Column(db.Text)  # 摘要
+    content = db.Column(db.Text)  # 完整內容
+    url = db.Column(db.String(500))  # 原文連結
+    image_url = db.Column(db.String(500))  # 封面圖片
+    featured = db.Column(db.Boolean, default=False)  # 是否精選
+    view_count = db.Column(db.Integer, default=0)  # 瀏覽次數
+    tags = db.Column(db.JSON)  # 標籤
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'mediaName': self.media_name,
+            'mediaType': self.media_type,
+            'publicationDate': self.publication_date.isoformat() if self.publication_date else None,
+            'author': self.author,
+            'summary': self.summary,
+            'content': self.content,
+            'url': self.url,
+            'imageUrl': self.image_url,
+            'featured': self.featured,
+            'viewCount': self.view_count,
+            'tags': self.tags if self.tags else [],
+            'createdAt': self.created_at.isoformat() if self.created_at else None,
+            'updatedAt': self.updated_at.isoformat() if self.updated_at else None
+        }
+
 class UploadedFile(db.Model):
     """文件上傳模型"""
     __tablename__ = 'uploaded_files'

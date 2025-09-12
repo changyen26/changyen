@@ -1,5 +1,5 @@
 // 管理後台API功能
-import { UserInfo, Project, Skill, Competition, Patent, FileData } from '../types/admin';
+import { UserInfo, Project, Skill, Competition, Patent, MediaCoverage, FileData } from '../types/admin';
 import { logger } from './logger';
 
 // 分析數據介面
@@ -72,6 +72,7 @@ class AdminApiService {
     SKILLS: 'portfolio_skills',
     COMPETITIONS: 'portfolio_competitions',
     PATENTS: 'portfolio_patents',
+    MEDIA_COVERAGE: 'portfolio_media_coverage',
     FILES: 'portfolio_files',
     EXPERIENCES: 'portfolio_experiences',
     EDUCATION: 'portfolio_education',
@@ -528,6 +529,110 @@ class AdminApiService {
       }
     } catch (error) {
       logger.error('Failed to delete patent:', error);
+      return false;
+    }
+  }
+
+  // ===== 媒體報導管理 =====
+  async getMediaCoverage(): Promise<MediaCoverage[]> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/media-coverage`);
+        if (response.ok) {
+          return await response.json();
+        }
+        return [];
+      } else {
+        const stored = localStorage.getItem(this.STORAGE_KEYS.MEDIA_COVERAGE);
+        return stored ? JSON.parse(stored) : [];
+      }
+    } catch (error) {
+      logger.error('Failed to fetch media coverage:', error);
+      return [];
+    }
+  }
+
+  async createMediaCoverage(mediaCoverage: Partial<MediaCoverage>): Promise<MediaCoverage | null> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/media-coverage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(mediaCoverage),
+        });
+        if (response.ok) {
+          return await response.json();
+        }
+        return null;
+      } else {
+        const newMediaCoverage: MediaCoverage = {
+          id: Date.now().toString(),
+          title: mediaCoverage.title || '',
+          mediaName: mediaCoverage.mediaName || '',
+          summary: mediaCoverage.summary,
+          articleUrl: mediaCoverage.articleUrl,
+          imageUrl: mediaCoverage.imageUrl,
+          category: mediaCoverage.category || '媒體報導',
+          status: mediaCoverage.status || '已發布',
+          publicationDate: mediaCoverage.publicationDate,
+          featured: mediaCoverage.featured || false,
+          createdAt: new Date().toISOString(),
+        };
+
+        const mediaList = await this.getMediaCoverage();
+        mediaList.push(newMediaCoverage);
+        localStorage.setItem(this.STORAGE_KEYS.MEDIA_COVERAGE, JSON.stringify(mediaList));
+        return newMediaCoverage;
+      }
+    } catch (error) {
+      logger.error('Failed to create media coverage:', error);
+      return null;
+    }
+  }
+
+  async updateMediaCoverage(id: string, mediaCoverage: Partial<MediaCoverage>): Promise<MediaCoverage | null> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/media-coverage/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(mediaCoverage),
+        });
+        if (response.ok) {
+          return await response.json();
+        }
+        return null;
+      } else {
+        const mediaList = await this.getMediaCoverage();
+        const index = mediaList.findIndex(m => m.id === id);
+        if (index !== -1) {
+          mediaList[index] = { ...mediaList[index], ...mediaCoverage };
+          localStorage.setItem(this.STORAGE_KEYS.MEDIA_COVERAGE, JSON.stringify(mediaList));
+          return mediaList[index];
+        }
+        return null;
+      }
+    } catch (error) {
+      logger.error('Failed to update media coverage:', error);
+      return null;
+    }
+  }
+
+  async deleteMediaCoverage(id: string): Promise<boolean> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/media-coverage/${id}`, {
+          method: 'DELETE',
+        });
+        return response.ok;
+      } else {
+        const mediaList = await this.getMediaCoverage();
+        const filtered = mediaList.filter(m => m.id !== id);
+        localStorage.setItem(this.STORAGE_KEYS.MEDIA_COVERAGE, JSON.stringify(filtered));
+        return true;
+      }
+    } catch (error) {
+      logger.error('Failed to delete media coverage:', error);
       return false;
     }
   }

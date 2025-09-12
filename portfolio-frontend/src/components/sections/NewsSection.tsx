@@ -4,31 +4,35 @@ import { motion } from 'framer-motion';
 import { logger } from '../../lib/logger';
 import { Newspaper, Calendar, ExternalLink, Eye } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { mockNews } from '../../data/mockData';
 import { formatDate } from '../../lib/utils';
 import { useInView } from '../../hooks/useInView';
 import Card from '../common/Card';
 import Button from '../common/Button';
-import { NewsArticle } from '../../types';
+import { MediaCoverage } from '../../types/admin';
+import { adminApi } from '../../lib/adminApi';
 
 export default function NewsSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });
-  const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
-  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [selectedArticle, setSelectedArticle] = useState<string | null>(null);
+  const [news, setNews] = useState<MediaCoverage[]>([]);
 
   useEffect(() => {
     const loadNews = async () => {
       try {
-        // 暫時只使用 mockNews，直到統一 API 回應格式
-        setNews(mockNews);
-        // TODO: 統一 adminApi.getNews() 和 mockNews 的類型格式
-        // const newsData = await adminApi.getNews();
-        // if (newsData && newsData.length > 0) {
-        //   setNews(newsData);
-        // }
+        // 從後端 API 獲取媒體報導數據
+        const newsData = await adminApi.getMediaCoverage();
+        logger.log('NewsSection loaded media coverage from API:', newsData);
+        
+        if (newsData && newsData.length > 0) {
+          setNews(newsData);
+        } else {
+          // 如果 API 沒有數據，使用空陣列
+          setNews([]);
+        }
       } catch (error) {
-        logger.error('Failed to load news:', error);
-        setNews(mockNews);
+        logger.error('Failed to load media coverage from API:', error);
+        // API 失敗時使用空陣列
+        setNews([]);
       }
     };
 
@@ -111,18 +115,18 @@ export default function NewsSection() {
                   </motion.div>
                   
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-700">
-                    {article.media_outlet}
+                    {article.mediaName}
                   </div>
                 </div>
 
                 <div className="p-6">
                   <div className="flex items-center text-sm text-gray-500 mb-3">
                     <Calendar size={16} className="mr-2" />
-                    <span>{formatDate(article.publication_date)}</span>
+                    <span>{formatDate(article.publicationDate)}</span>
                   </div>
 
                   <h3 className="text-xl font-bold text-gray-900 mb-4 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
-                    {article.headline}
+                    {article.title}
                   </h3>
 
                   <p className="text-gray-600 mb-6 line-clamp-3 leading-relaxed">
@@ -141,7 +145,7 @@ export default function NewsSection() {
                     </Button>
 
                     <motion.a
-                      href={article.article_url}
+                      href={article.articleUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200"
@@ -170,8 +174,8 @@ export default function NewsSection() {
                       
                       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center justify-between text-sm text-gray-600">
-                          <span>媒體來源：{article.media_outlet}</span>
-                          <span>發佈日期：{formatDate(article.publication_date)}</span>
+                          <span>媒體來源：{article.mediaName}</span>
+                          <span>發佈日期：{formatDate(article.publicationDate)}</span>
                         </div>
                       </div>
                     </div>
@@ -212,7 +216,7 @@ export default function NewsSection() {
                   animate={isInView ? { scale: 1 } : {}}
                   transition={{ duration: 0.5, delay: 1.1 }}
                 >
-                  {new Set(news.map(n => n.media_outlet)).size}
+                  {new Set(news.map(n => n.mediaName)).size}
                 </motion.div>
                 <div className="text-gray-600">媒體機構</div>
               </div>

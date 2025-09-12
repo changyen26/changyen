@@ -380,7 +380,7 @@ export default function AdminPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
+          className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6"
         >
           <Card className="p-6 text-center hover:shadow-lg transition-shadow">
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -464,6 +464,23 @@ export default function AdminPage() {
               onClick={() => window.location.href = '/admin/patents'}
             >
               管理專利
+            </Button>
+          </Card>
+
+          <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a1 1 0 00-.293-.707l-2.414-2.414A1 1 0 0016 6v1" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">媒體報導</h3>
+            <p className="text-gray-600 mb-4">管理媒體報導和新聞記錄</p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.location.href = '/admin/media-coverage'}
+            >
+              管理報導
             </Button>
           </Card>
         </motion.div>

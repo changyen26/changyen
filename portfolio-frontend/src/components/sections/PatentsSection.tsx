@@ -7,10 +7,10 @@ import { useState, useEffect } from 'react';
 import { formatDate } from '../../lib/utils';
 import { useInView } from '../../hooks/useInView';
 import Card from '../common/Card';
-import { Patent } from '../../types';
-import { mockPatents } from '../../data/mockData';
+import { Patent } from '../../types/admin';
+import { adminApi } from '../../lib/adminApi';
 
-const categories = ['全部', '人工智能', '物聯網', '區塊鏈'];
+const categories = ['全部', '發明專利', '新型專利', '設計專利'];
 
 export default function PatentsSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });
@@ -20,12 +20,20 @@ export default function PatentsSection() {
   useEffect(() => {
     const loadPatents = async () => {
       try {
-        // 暫時使用 mockPatents，直到後端 Patent API 完成
-        setPatents(mockPatents);
-        logger.log('PatentsSection loaded patents data:', mockPatents);
+        // 從後端 API 獲取專利數據
+        const patentsData = await adminApi.getPatents();
+        logger.log('PatentsSection loaded patents from API:', patentsData);
+        
+        if (patentsData && patentsData.length > 0) {
+          setPatents(patentsData);
+        } else {
+          // 如果 API 沒有數據，使用空陣列
+          setPatents([]);
+        }
       } catch (error) {
-        logger.error('Failed to load patents:', error);
-        setPatents(mockPatents);
+        logger.error('Failed to load patents from API:', error);
+        // API 失敗時使用空陣列
+        setPatents([]);
       }
     };
 
@@ -126,8 +134,12 @@ export default function PatentsSection() {
             >
               <Card className="p-8 h-full hover:shadow-2xl">
                 <div className="flex items-start justify-between mb-6">
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${patent.status === 'granted' ? 'bg-green-100 text-green-700' : patent.status === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
-                    {patent.status === 'granted' ? '已授權' : patent.status === 'pending' ? '審查中' : '已過期'}
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    patent.status === '已核准' || patent.status === '已授權' ? 'bg-green-100 text-green-700' : 
+                    patent.status === '審查中' || patent.status === 'pending' ? 'bg-blue-100 text-blue-700' : 
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    {patent.status}
                   </div>
                   
                   <motion.div
@@ -148,22 +160,24 @@ export default function PatentsSection() {
                 </p>
 
                 <div className="space-y-3">
-                  {patent.patent_number && (
+                  {patent.patentNumber && (
                     <div className="flex items-center text-sm text-gray-500">
                       <Award size={16} className="mr-2" />
-                      <span>專利號：{patent.patent_number}</span>
+                      <span>專利號：{patent.patentNumber}</span>
                     </div>
                   )}
                   
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Calendar size={16} className="mr-2" />
-                    <span>申請日期：{formatDate(patent.filing_date)}</span>
-                  </div>
-
-                  {patent.grant_date && (
+                  {patent.filingDate && (
                     <div className="flex items-center text-sm text-gray-500">
                       <Calendar size={16} className="mr-2" />
-                      <span>授權日期：{formatDate(patent.grant_date)}</span>
+                      <span>申請日期：{formatDate(patent.filingDate)}</span>
+                    </div>
+                  )}
+
+                  {patent.grantDate && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <Calendar size={16} className="mr-2" />
+                      <span>授權日期：{formatDate(patent.grantDate)}</span>
                     </div>
                   )}
                 </div>
