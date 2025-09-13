@@ -33,8 +33,8 @@ class Config:
         'echo': False  # 設為 True 可看到 SQL 查詢
     }
     
-    # 文件上傳配置
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
+    # 文件上傳配置 - 動態路徑，支援本地和雲端部署
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or os.path.join(os.path.dirname(__file__), 'uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB 最大文件大小
     
     # CORS 配置 - 包含本地和線上域名

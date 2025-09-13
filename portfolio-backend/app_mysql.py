@@ -5,7 +5,7 @@ Portfolio Backend API - Flask + MySQL + SQLAlchemy
 個人作品集後端API，整合MySQL資料庫
 """
 
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, current_app
 from flask_cors import CORS
 from flask_migrate import Migrate
 from datetime import datetime, date, timedelta
@@ -280,7 +280,11 @@ def register_routes(app):
             # 設置技術列表
             if data.get('technologies'):
                 competition.set_technologies(data['technologies'])
-            
+
+            # 設置作品圖片
+            if data.get('projectImages'):
+                competition.set_project_images(data['projectImages'])
+
             db.session.add(competition)
             db.session.commit()
             
@@ -294,7 +298,13 @@ def register_routes(app):
     def update_competition(competition_id):
         """更新競賽"""
         data = request.get_json()
-        
+
+        # 調試：檢查接收到的數據
+        print(f"📝 更新競賽 ID {competition_id}")
+        print(f"📝 接收到的數據: {data}")
+        if data and 'projectImages' in data:
+            print(f"📝 作品圖片數據: {data['projectImages']}")
+
         if not data:
             return jsonify({"error": "無效的請求資料"}), 400
         
@@ -312,11 +322,11 @@ def register_routes(app):
             
             # 更新競賽資料
             update_fields = [
-                'name', 'result', 'description', 'certificate_url', 
-                'category', 'featured', 'organizer', 'location', 
-                'team_size', 'role', 'project_url'
+                'name', 'result', 'description', 'detailed_description',
+                'certificate_url', 'category', 'featured', 'organizer',
+                'location', 'team_size', 'role', 'project_url'
             ]
-            
+
             for field in update_fields:
                 api_field = field
                 if field == 'certificate_url':
@@ -325,16 +335,22 @@ def register_routes(app):
                     api_field = 'teamSize'
                 elif field == 'project_url':
                     api_field = 'projectUrl'
+                elif field == 'detailed_description':
+                    api_field = 'detailedDescription'
 
                 if api_field in data:
                     setattr(competition, field, data[api_field])
                     # 特別處理 name 欄位，同時更新 competition_name
                     if field == 'name':
                         competition.competition_name = data[api_field]
-            
+
             # 更新技術列表
             if 'technologies' in data:
                 competition.set_technologies(data['technologies'])
+
+            # 更新作品圖片 URL
+            if 'projectImages' in data:
+                competition.set_project_images(data['projectImages'])
             
             db.session.commit()
             return jsonify(competition.to_dict())
@@ -1071,6 +1087,63 @@ def register_routes(app):
             
         except Exception as e:
             return jsonify({"error": f"獲取最近瀏覽記錄失敗: {str(e)}"}), 500
+
+    # ===== 文件上傳端點 =====
+    @app.route('/api/v1/upload', methods=['POST'])
+    def upload_multipart_file():
+        """處理文件上傳"""
+        try:
+            if 'file' not in request.files:
+                return jsonify({"error": "沒有文件"}), 400
+
+            file = request.files['file']
+            if file.filename == '':
+                return jsonify({"error": "沒有選擇文件"}), 400
+
+            if file:
+                # 生成安全的文件名
+                from werkzeug.utils import secure_filename
+
+                # 獲取文件擴展名
+                filename = secure_filename(file.filename)
+                ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+
+                # 驗證文件類型
+                allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+                if ext not in allowed_extensions:
+                    return jsonify({"error": f"不支援的文件格式。允許的格式：{', '.join(allowed_extensions)}"}), 400
+
+                # 生成唯一文件名
+                unique_filename = f"{uuid.uuid4().hex}.{ext}"
+
+                # 確保上傳目錄存在
+                upload_dir = current_app.config['UPLOAD_FOLDER']
+                os.makedirs(upload_dir, exist_ok=True)
+
+                # 保存文件
+                file_path = os.path.join(upload_dir, unique_filename)
+                file.save(file_path)
+
+                # 返回文件 URL
+                file_url = f"/uploads/{unique_filename}"
+                return jsonify({
+                    "success": True,
+                    "file_url": file_url,
+                    "filename": unique_filename
+                })
+
+        except Exception as e:
+            return jsonify({"error": f"文件上傳失敗: {str(e)}"}), 500
+
+    # ===== 靜態文件服務 =====
+    @app.route('/uploads/<filename>')
+    def serve_uploaded_file(filename):
+        """提供上傳的文件"""
+        try:
+            upload_dir = current_app.config['UPLOAD_FOLDER']
+            return send_from_directory(upload_dir, filename)
+        except Exception as e:
+            return jsonify({"error": f"文件不存在: {str(e)}"}), 404
 
     # ===== 錯誤處理 =====
     @app.errorhandler(404)

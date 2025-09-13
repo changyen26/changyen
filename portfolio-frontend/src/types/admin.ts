@@ -67,6 +67,7 @@ export interface Competition {
   id: string;
   name: string; // 統一使用 name 作為競賽名稱
   description: string;
+  detailedDescription?: string; // 詳細競賽過程介紹
   organizer: string;
   category: string; // 競賽類別：技術創新、商業競賽、學術競賽等
   date: string;
@@ -77,6 +78,7 @@ export interface Competition {
   technologies?: string[]; // 使用的技術
   certificateUrl?: string; // 證書連結（保留向後相容）
   certificateFile?: FileData; // 證書文件數據
+  projectImages?: string[]; // 作品圖片 URL 列表
   projectUrl?: string; // 專案連結
   featured: boolean; // 是否為精選競賽
   createdAt: string;

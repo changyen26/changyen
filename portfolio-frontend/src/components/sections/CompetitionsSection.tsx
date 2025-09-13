@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect as useClientEffect } from 'react';
+
 import { useState, useEffect } from 'react';
 import { logger } from '../../lib/logger';
 import { motion } from 'framer-motion';
@@ -30,7 +32,12 @@ export default function CompetitionsSection() {
       }
     };
 
-    loadCompetitions();
+    // 強制客戶端載入（修復 SSR/hydration 問題）
+    const timer = setTimeout(() => {
+      loadCompetitions();
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const timelineVariants = {
@@ -92,10 +99,16 @@ export default function CompetitionsSection() {
   const detailedStats = getDetailedStats();
 
   const handleCompetitionClick = (competition: Competition) => {
-    if (competition.certificateFile || competition.certificateUrl) {
-      setSelectedCompetition(competition);
-      setShowModal(true);
-    }
+    // 檢查是否有詳細資訊可以顯示
+    const hasDetails = competition.certificateFile ||
+        (competition.certificateUrl && competition.certificateUrl.trim() !== '') ||
+        (competition.detailedDescription && competition.detailedDescription.trim() !== '') ||
+        (competition.projectImages && competition.projectImages.length > 0) ||
+        (competition.projectUrl && competition.projectUrl.trim() !== '');
+
+    // 只要有任何競賽資料就可以點擊查看
+    setSelectedCompetition(competition);
+    setShowModal(true);
   };
 
   const closeModal = () => {
@@ -209,11 +222,7 @@ export default function CompetitionsSection() {
                 {/* 桌面版卡片佈局 */}
                 <div className={`hidden md:block w-1/2 ${index % 2 === 0 ? 'pr-8' : 'pl-8'}`}>
                   <Card
-                    className={`p-8 group hover:shadow-2xl ${
-                      (competition.certificateFile || competition.certificateUrl)
-                        ? 'cursor-pointer hover:scale-105 transition-transform duration-200'
-                        : ''
-                    }`}
+                    className="p-8 group hover:shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-200"
                     onClick={() => handleCompetitionClick(competition)}
                   >
                     <div className="flex items-start justify-between mb-6">
@@ -221,7 +230,7 @@ export default function CompetitionsSection() {
                         <Trophy size={24} />
                       </div>
 
-                      {(competition.certificateUrl || competition.certificateFile) && (
+                      {(
                         <motion.div
                           className="opacity-70 group-hover:opacity-100 transition-opacity duration-200 p-2 bg-blue-100 rounded-full"
                           whileHover={{ scale: 1.1 }}
@@ -232,7 +241,8 @@ export default function CompetitionsSection() {
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
                         </motion.div>
                       )}
@@ -269,11 +279,7 @@ export default function CompetitionsSection() {
                 {/* 手機版卡片佈局 */}
                 <div className="md:hidden flex-1 ml-14 mr-4">
                   <Card
-                    className={`p-4 group hover:shadow-lg ${
-                      (competition.certificateFile || competition.certificateUrl)
-                        ? 'cursor-pointer hover:scale-[1.02] transition-all duration-300'
-                        : ''
-                    } border-l-4 ${getRankColor(competition.result).includes('yellow') ? 'border-yellow-400' :
+                    className={`p-4 group hover:shadow-lg cursor-pointer hover:scale-[1.02] transition-all duration-300 border-l-4 ${getRankColor(competition.result).includes('yellow') ? 'border-yellow-400' :
                       getRankColor(competition.result).includes('gray') ? 'border-gray-400' :
                       getRankColor(competition.result).includes('orange') ? 'border-orange-400' :
                       getRankColor(competition.result).includes('blue') ? 'border-blue-400' :
@@ -286,7 +292,7 @@ export default function CompetitionsSection() {
                         <Trophy size={18} />
                       </div>
 
-                      {(competition.certificateUrl || competition.certificateFile) && (
+                      {(
                         <motion.div
                           className="opacity-60 group-hover:opacity-100 transition-opacity duration-200 p-1 bg-blue-50 rounded-full flex-shrink-0 ml-2"
                           whileHover={{ scale: 1.1 }}
@@ -297,7 +303,8 @@ export default function CompetitionsSection() {
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
                         </motion.div>
                       )}
@@ -462,14 +469,88 @@ export default function CompetitionsSection() {
                 </div>
 
                 {selectedCompetition.description && (
-                  <p className="text-gray-700 mb-6 leading-relaxed">
-                    {selectedCompetition.description}
-                  </p>
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">競賽簡介</h4>
+                    <p className="text-gray-700 leading-relaxed">
+                      {selectedCompetition.description}
+                    </p>
+                  </div>
+                )}
+
+                {selectedCompetition.detailedDescription && (
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">詳細過程介紹</h4>
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                      {selectedCompetition.detailedDescription}
+                    </p>
+                  </div>
+                )}
+
+                {selectedCompetition.projectImages && selectedCompetition.projectImages.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">作品圖片</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {selectedCompetition.projectImages.map((imageUrl, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.3, delay: index * 0.1 }}
+                          className="relative group cursor-pointer"
+                          onClick={() => window.open(imageUrl, '_blank')}
+                        >
+                          <img
+                            src={imageUrl}
+                            alt={`作品圖片 ${index + 1}`}
+                            className="w-full h-48 object-cover rounded-lg shadow-md group-hover:shadow-lg transition-shadow duration-200"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWclueBh+eEoeazleilv+WPqzwvdGV4dD48L3N2Zz4=';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white rounded-full p-2">
+                              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedCompetition.technologies && selectedCompetition.technologies.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-3">使用技術</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCompetition.technologies.map((tech, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(selectedCompetition.teamSize && selectedCompetition.teamSize > 1) && (
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">團隊資訊</h4>
+                    <p className="text-gray-700">
+                      團隊人數：{selectedCompetition.teamSize} 人
+                      {selectedCompetition.role && ` · 擔任角色：${selectedCompetition.role}`}
+                    </p>
+                  </div>
                 )}
 
                 {/* 證書顯示 */}
                 {selectedCompetition.certificateFile && (
-                  <div className="mb-4">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">獲獎證書</h4>
                     {selectedCompetition.certificateFile.type.startsWith('image/') ? (
                       <img
                         src={adminApi.getFileDataUrl(selectedCompetition.certificateFile)}
@@ -499,28 +580,32 @@ export default function CompetitionsSection() {
                   </div>
                 )}
 
-                {selectedCompetition.certificateUrl && !selectedCompetition.certificateFile && (
-                  <div className="text-center py-8">
+                {/* 外部連結按鈕 */}
+                <div className="flex flex-wrap gap-3 justify-center mt-6">
+                  {selectedCompetition.certificateUrl && !selectedCompetition.certificateFile && (
                     <button
                       onClick={() => window.open(selectedCompetition.certificateUrl, '_blank')}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                     >
-                      查看證書連結
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      查看證書
                     </button>
-                  </div>
-                )}
+                  )}
 
-
-                {selectedCompetition.projectUrl && (
-                  <div className="mt-4 text-center">
+                  {selectedCompetition.projectUrl && (
                     <button
                       onClick={() => window.open(selectedCompetition.projectUrl, '_blank')}
-                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
                     >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
                       查看專案
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </motion.div>
           </div>

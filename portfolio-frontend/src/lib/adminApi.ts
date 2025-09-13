@@ -62,7 +62,7 @@ interface ExportData {
   exportedAt: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 // 模擬API調用 - 在本地存儲中保存數據
 class AdminApiService {
@@ -768,15 +768,14 @@ class AdminApiService {
     try {
       if (API_BASE_URL) {
         const response = await fetch(`${API_BASE_URL}/api/v1/competitions`);
-        
+
         if (!response.ok) {
           logger.error('API Error:', response.status, response.statusText);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const apiData = await response.json();
-        logger.log('API Response:', apiData);
-        
+
         // 確保 apiData 是陣列
         if (!Array.isArray(apiData)) {
           logger.error('Expected array but got:', typeof apiData, apiData);
@@ -790,6 +789,7 @@ class AdminApiService {
           result: string;
           date: string;
           description: string;
+          detailedDescription?: string;
           certificateUrl?: string;
           category?: string;
           featured?: boolean;
@@ -799,6 +799,7 @@ class AdminApiService {
           role?: string;
           technologies?: string[];
           projectUrl?: string;
+          projectImages?: string[];
           createdAt?: string;
         }) => ({
           id: comp.id,
@@ -806,6 +807,7 @@ class AdminApiService {
           result: comp.result,
           date: comp.date,
           description: comp.description,
+          detailedDescription: comp.detailedDescription || undefined,
           certificateUrl: comp.certificateUrl || '',
           category: comp.category || '技術競賽', // 提供預設值
           featured: comp.featured !== false,
@@ -815,6 +817,7 @@ class AdminApiService {
           role: comp.role || '',
           technologies: comp.technologies || [],
           projectUrl: comp.projectUrl || '',
+          projectImages: comp.projectImages || [], // 修復：加入 projectImages 處理
           createdAt: comp.createdAt || new Date().toISOString()
         }));
       } else {
@@ -835,6 +838,7 @@ class AdminApiService {
           name: competition.name || "",  // 前端使用 name，後端期望 name
           result: competition.result || "",
           description: competition.description || "",
+          detailedDescription: competition.detailedDescription || "",
           date: competition.date || "",
           certificateUrl: competition.certificateUrl || "",
           category: competition.category || "技術競賽",
@@ -844,7 +848,8 @@ class AdminApiService {
           teamSize: competition.teamSize || 1,
           role: competition.role || "",
           projectUrl: competition.projectUrl || "",
-          technologies: competition.technologies || []
+          technologies: competition.technologies || [],
+          projectImages: competition.projectImages || []  // 修復：加入 projectImages 欄位
         };
 
         // 檢查必填欄位
@@ -895,6 +900,7 @@ class AdminApiService {
           name: competition.name || "",  // 修復：使用 name 而不是 title
           result: competition.result || "",
           description: competition.description || "",
+          detailedDescription: competition.detailedDescription || "",
           date: competition.date || "",
           certificateUrl: competition.certificateUrl || "",
           category: competition.category || "技術競賽",
@@ -904,7 +910,8 @@ class AdminApiService {
           teamSize: competition.teamSize || 1,
           role: competition.role || "",
           projectUrl: competition.projectUrl || "",
-          technologies: competition.technologies || []
+          technologies: competition.technologies || [],
+          projectImages: competition.projectImages || []  // 修復：加入 projectImages 欄位
         };
 
         logger.log('Updating competition data:', competitionData);

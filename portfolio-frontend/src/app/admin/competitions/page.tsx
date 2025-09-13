@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
 import FileUpload from '../../../components/common/FileUpload';
+import ImageUpload from '../../../components/common/ImageUpload';
 import { adminApi } from '../../../lib/adminApi';
 
 // 本地競賽類型定義 - 避免 Zeabur 部署環境的模塊解析衝突
@@ -13,6 +14,7 @@ interface LocalCompetition {
   id: string;
   name: string;
   description: string;
+  detailedDescription?: string;
   organizer: string;
   category: string;
   date: string;
@@ -30,6 +32,7 @@ interface LocalCompetition {
     data: string;
     uploadedAt: string;
   } | null;
+  projectImages?: string[];  // 改為 URL 字符串數組
   projectUrl?: string;
   featured: boolean;
   createdAt: string;
@@ -67,6 +70,7 @@ export default function CompetitionsPage() {
     id: '',
     name: '',
     description: '',
+    detailedDescription: '',
     organizer: '',
     category: '技術創新',
     date: '',
@@ -77,6 +81,7 @@ export default function CompetitionsPage() {
     technologies: [],
     certificateUrl: '',
     certificateFile: undefined,
+    projectImages: [],
     projectUrl: '',
     featured: false,
     createdAt: new Date().toISOString()
@@ -96,6 +101,7 @@ export default function CompetitionsPage() {
       id: String(item.id || ''),
       name: String(item.name || ''),
       description: String(item.description || ''),
+      detailedDescription: item.detailedDescription ? String(item.detailedDescription) : undefined,
       organizer: String(item.organizer || ''),
       category: String(item.category || '技術創新'),
       date: String(item.date || ''),
@@ -106,6 +112,7 @@ export default function CompetitionsPage() {
       technologies: Array.isArray(item.technologies) ? item.technologies as string[] : [],
       certificateUrl: item.certificateUrl ? String(item.certificateUrl) : undefined,
       certificateFile: item.certificateFile as LocalCompetition['certificateFile'],
+      projectImages: Array.isArray(item.projectImages) ? item.projectImages as string[] : [],
       projectUrl: item.projectUrl ? String(item.projectUrl) : undefined,
       featured: Boolean(item.featured !== false),
       createdAt: String(item.createdAt || new Date().toISOString())
@@ -117,6 +124,7 @@ export default function CompetitionsPage() {
     id: local.id,
     name: local.name,
     description: local.description,
+    detailedDescription: local.detailedDescription,
     organizer: local.organizer,
     category: local.category,
     date: local.date,
@@ -127,6 +135,7 @@ export default function CompetitionsPage() {
     technologies: local.technologies,
     certificateUrl: local.certificateUrl,
     certificateFile: local.certificateFile,
+    projectImages: local.projectImages || [],  // 確保總是有值
     projectUrl: local.projectUrl,
     featured: local.featured,
     createdAt: local.createdAt
@@ -152,6 +161,13 @@ export default function CompetitionsPage() {
 
       // 轉換為 API 期望的格式
       const apiData = convertToApiFormat(editingCompetition) as Record<string, unknown>;
+
+      // 調試：檢查要發送的數據
+      console.log('💾 準備保存的競賽數據:', editingCompetition);
+      console.log('💾 editingCompetition.projectImages:', editingCompetition.projectImages);
+      console.log('💾 轉換後的 API 數據:', apiData);
+      console.log('💾 API數據中的projectImages:', (apiData as any).projectImages);
+      console.log('💾 作品圖片數量:', editingCompetition.projectImages?.length || 0);
 
       const success = editingCompetition.id
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -189,6 +205,8 @@ export default function CompetitionsPage() {
 
   const startEdit = (competition?: LocalCompetition) => {
     if (competition) {
+      console.log('編輯競賽:', competition);
+      console.log('作品圖片:', competition.projectImages);
       setEditingCompetition(competition);
       setTechInput(competition.technologies?.join(', ') || '');
     } else {
@@ -475,10 +493,90 @@ export default function CompetitionsPage() {
                   <textarea
                     value={editingCompetition.description || ''}
                     onChange={(e) => setEditingCompetition({...editingCompetition, description: e.target.value})}
-                    rows={4}
+                    rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="請描述競賽內容、參賽作品或獲獎感想..."
                   />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    詳細競賽過程介紹
+                  </label>
+                  <textarea
+                    value={editingCompetition.detailedDescription || ''}
+                    onChange={(e) => setEditingCompetition({...editingCompetition, detailedDescription: e.target.value})}
+                    rows={6}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="詳細描述競賽過程、團隊合作經驗、技術挑戰、解決方案等..."
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">作品圖片管理</h3>
+
+                  {/* 顯示已上傳的圖片 */}
+                  {editingCompetition.projectImages && editingCompetition.projectImages.length > 0 && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        已上傳圖片 ({editingCompetition.projectImages.length})
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {editingCompetition.projectImages.map((imageUrl, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={imageUrl}
+                              alt={`作品圖片 ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                              onError={(e) => {
+                                console.log('管理後台圖片載入失敗:', imageUrl);
+                                const target = e.target as HTMLImageElement;
+                                target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWclueBh+eEoeazleilv+WPqzwvdGV4dD48L3N2Zz4=';
+                              }}
+                              onLoad={(e) => {
+                                console.log('管理後台圖片載入成功:', imageUrl);
+                              }}
+                            />
+                            <button
+                              onClick={() => {
+                                const newImages = editingCompetition.projectImages?.filter((_, i) => i !== index) || [];
+                                setEditingCompetition({...editingCompetition, projectImages: newImages});
+                              }}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                              type="button"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 上傳新圖片 */}
+                  <ImageUpload
+                    label="上傳作品圖片"
+                    onImageUpload={(imageUrl) => {
+                      console.log('📥 管理後台接收到圖片URL:', imageUrl);
+                      const currentImages = editingCompetition.projectImages || [];
+                      console.log('📥 當前圖片陣列:', currentImages);
+
+                      const updatedCompetition = {
+                        ...editingCompetition,
+                        projectImages: [...currentImages, imageUrl]
+                      };
+
+                      console.log('📥 更新後的競賽數據:', updatedCompetition);
+                      console.log('📥 更新後的圖片陣列:', updatedCompetition.projectImages);
+
+                      setEditingCompetition(updatedCompetition);
+                    }}
+                    className="mb-4"
+                  />
+
+                  <p className="text-xs text-gray-500">
+                    可以上傳多張圖片展示作品成果、獎狀、團隊合照等
+                  </p>
                 </div>
 
                 <div className="md:col-span-2">

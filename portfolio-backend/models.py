@@ -60,8 +60,10 @@ class Competition(db.Model):
     competition_name = db.Column(db.String(200), nullable=False)  # 向下相容欄位，與 name 同步
     result = db.Column(db.String(100))  # 獲獎結果：金牌、銀牌、銅牌等
     description = db.Column(db.Text)
+    detailed_description = db.Column(db.Text)  # 詳細競賽過程介紹
     date = db.Column(db.Date)
     certificate_url = db.Column(db.String(255))
+    project_images = db.Column(db.Text)  # 作品圖片 URL 列表 (JSON 格式)
     category = db.Column(db.String(100), default='技術創新')
     featured = db.Column(db.Boolean, default=True)
     
@@ -88,7 +90,20 @@ class Competition(db.Model):
     def set_technologies(self, tech_list):
         """設置技術列表"""
         self.technologies = json.dumps(tech_list) if tech_list else '[]'
-    
+
+    def get_project_images(self):
+        """獲取作品圖片 URL 列表"""
+        if self.project_images:
+            try:
+                return json.loads(self.project_images)
+            except:
+                return []
+        return []
+
+    def set_project_images(self, image_urls):
+        """設置作品圖片 URL 列表"""
+        self.project_images = json.dumps(image_urls) if image_urls else '[]'
+
     def to_dict(self, include_file_data=False):
         """轉換為字典格式
         Args:
@@ -99,8 +114,10 @@ class Competition(db.Model):
             'name': self.name,
             'result': self.result,
             'description': self.description or '',
+            'detailedDescription': self.detailed_description or '',
             'date': self.date.isoformat() if self.date else None,
             'certificateUrl': self.certificate_url or '',
+            'projectImages': self.get_project_images(),
             'category': self.category or '技術創新',
             'featured': bool(self.featured),
             'organizer': self.organizer or '',
