@@ -29,27 +29,26 @@ export default function HeroSection() {
   });
 
   useEffect(() => {
-    // Load user data
-    const loadUserData = async () => {
-      try {
-        const userData = await adminApi.getUserInfo();
-        logger.log('HeroSection loaded user data:', userData);
-        if (userData) {
-          setUserInfo(userData);
+    // 延遲載入用戶資料，避免阻塞初始渲染
+    const timer = setTimeout(() => {
+      const loadUserData = async () => {
+        try {
+          const userData = await adminApi.getUserInfo();
+          logger.log('HeroSection loaded user data:', userData);
+          if (userData) {
+            setUserInfo(userData);
+          }
+        } catch (error) {
+          logger.error('Failed to load user info in HeroSection:', error);
         }
-      } catch (error) {
-        logger.error('Failed to load user info in HeroSection:', error);
-      }
-    };
+      };
+      loadUserData();
+    }, 100); // 延遲 100ms 載入
 
-    loadUserData();
-
-    // Set up periodic reload for real-time updates
-    const interval = setInterval(loadUserData, 30000); // 30 seconds
-
+    // 恢復完整的 GSAP 動畫
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
-      
+
       // 背景動畫
       gsap.to(heroRef.current, {
         backgroundPosition: '50% 0%',
@@ -62,10 +61,10 @@ export default function HeroSection() {
       // 文字動畫
       if (titleRef.current) {
         const titleChars = titleRef.current.textContent?.split('') || [];
-        titleRef.current.innerHTML = titleChars.map(char => 
+        titleRef.current.innerHTML = titleChars.map(char =>
           `<span class="inline-block">${char === ' ' ? '&nbsp;' : char}</span>`
         ).join('');
-        
+
         tl.from(titleRef.current.children, {
           opacity: 0,
           y: 100,
@@ -86,7 +85,7 @@ export default function HeroSection() {
 
     return () => {
       ctx.revert();
-      clearInterval(interval);
+      clearTimeout(timer);
     };
   }, []);
 
@@ -115,7 +114,7 @@ export default function HeroSection() {
           const x = ((seed * 31) % 100) - 50; // -50 to 50
           const y = ((seed * 41) % 100) - 50; // -50 to 50
           const duration = ((seed * 7) % 10) + 10; // 10-20s
-          
+
           return (
             <motion.div
               key={i}

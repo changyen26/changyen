@@ -26,20 +26,21 @@ export default function Navigation() {
   const isVisible = scrollY < 100 || scrollDirection === 'up';
 
   useEffect(() => {
-    // Load user data
-    const loadUserData = async () => {
-      try {
-        const userData = await adminApi.getUserInfo();
-        logger.log('Navigation loaded user data:', userData);
-        if (userData && userData.name) {
-          setUserName(userData.name);
+    // 延遲載入用戶資料，避免阻塞初始渲染
+    const timer = setTimeout(() => {
+      const loadUserData = async () => {
+        try {
+          const userData = await adminApi.getUserInfo();
+          logger.log('Navigation loaded user data:', userData);
+          if (userData && userData.name) {
+            setUserName(userData.name);
+          }
+        } catch (error) {
+          logger.error('Failed to load user info in Navigation:', error);
         }
-      } catch (error) {
-        logger.error('Failed to load user info in Navigation:', error);
-      }
-    };
-
-    loadUserData();
+      };
+      loadUserData();
+    }, 200); // 延遲載入，讓頁面先渲染
 
     const handleSectionChange = () => {
       const sections = navItems.map(item => item.href.substring(1));
@@ -58,7 +59,10 @@ export default function Navigation() {
     };
 
     window.addEventListener('scroll', handleSectionChange);
-    return () => window.removeEventListener('scroll', handleSectionChange);
+    return () => {
+      window.removeEventListener('scroll', handleSectionChange);
+      clearTimeout(timer);
+    };
   }, []);
 
   const scrollToSection = (href: string) => {
