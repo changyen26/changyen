@@ -28,7 +28,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: http://localhost:8000 http://192.168.254.48:8000; font-src 'self'; connect-src 'self' http://localhost:8000 http://192.168.254.48:8000; frame-src 'none';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: http://localhost:8000 http://192.168.254.48:8000 https://changyen-backend.zeabur.app; font-src 'self'; connect-src 'self' http://localhost:8000 http://192.168.254.48:8000 https://changyen-backend.zeabur.app; frame-src 'none';",
           },
           {
             key: 'Strict-Transport-Security',
@@ -53,7 +53,7 @@ const nextConfig = {
   ],
   // 允許外部圖片域名
   images: {
-    domains: ['localhost', '192.168.254.48'],
+    domains: ['localhost', '192.168.254.48', 'changyen-backend.zeabur.app'],
     remotePatterns: [
       {
         protocol: 'http',
@@ -65,6 +65,11 @@ const nextConfig = {
         protocol: 'http',
         hostname: '192.168.254.48',
         port: '8000',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'changyen-backend.zeabur.app',
         pathname: '/uploads/**',
       },
     ],
