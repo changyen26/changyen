@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
 import FileUpload from '../../../components/common/FileUpload';
-import { Competition } from '../../../types/admin';
+import { Competition as CompetitionType } from '../../../types/admin';
 import { adminApi } from '../../../lib/adminApi';
 
 const COMPETITION_CATEGORIES = [
@@ -34,9 +34,9 @@ const COMPETITION_RESULTS = [
 ];
 
 export default function CompetitionsPage() {
-  const [competitions, setCompetitions] = useState<Competition[]>([]);
+  const [competitions, setCompetitions] = useState<CompetitionType[]>([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingCompetition, setEditingCompetition] = useState<Competition>({
+  const [editingCompetition, setEditingCompetition] = useState<CompetitionType>({
     id: '',
     name: '',  // 統一使用 name
     description: '',
@@ -108,7 +108,7 @@ export default function CompetitionsPage() {
     }
   };
 
-  const startEdit = (competition?: Competition) => {
+  const startEdit = (competition?: CompetitionType) => {
     if (competition) {
       setEditingCompetition(competition);
       setTechInput(competition.technologies?.join(', ') || '');
