@@ -1,4 +1,5 @@
-import { User, Patent, Competition, NewsArticle } from '@/types';
+import { User, Patent, NewsArticle } from '@/types';
+import { Competition } from '@/types/admin';
 
 export const mockUser: User = {
   id: 1,
