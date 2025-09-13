@@ -6,8 +6,34 @@ import { motion } from 'framer-motion';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
 import FileUpload from '../../../components/common/FileUpload';
-import { Competition as CompetitionType } from '../../../types/admin';
 import { adminApi } from '../../../lib/adminApi';
+
+// 本地競賽類型定義 - 避免 Zeabur 部署環境的模塊解析衝突
+interface LocalCompetition {
+  id: string;
+  name: string;
+  description: string;
+  organizer: string;
+  category: string;
+  date: string;
+  location?: string;
+  result: string;
+  teamSize?: number;
+  role?: string;
+  technologies?: string[];
+  certificateUrl?: string;
+  certificateFile?: {
+    id: string;
+    name: string;
+    type: string;
+    size: number;
+    data: string;
+    uploadedAt: string;
+  } | null;
+  projectUrl?: string;
+  featured: boolean;
+  createdAt: string;
+}
 
 const COMPETITION_CATEGORIES = [
   '技術創新',
@@ -34,10 +60,10 @@ const COMPETITION_RESULTS = [
 ];
 
 export default function CompetitionsPage() {
-  const [competitions, setCompetitions] = useState<CompetitionType[]>([]);
+  const [competitions, setCompetitions] = useState<LocalCompetition[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   // 明確定義初始競賽對象
-  const createEmptyCompetition = (): CompetitionType => ({
+  const createEmptyCompetition = (): LocalCompetition => ({
     id: '',
     name: '',
     description: '',
@@ -63,12 +89,34 @@ export default function CompetitionsPage() {
     loadCompetitions();
   }, []);
 
+  // 類型轉換函數 - 將外部 API 數據轉換為本地類型
+  const convertToLocalCompetition = (data: Record<string, unknown>): LocalCompetition => ({
+    id: String(data.id || ''),
+    name: String(data.name || ''),
+    description: String(data.description || ''),
+    organizer: String(data.organizer || ''),
+    category: String(data.category || '技術創新'),
+    date: String(data.date || ''),
+    location: data.location ? String(data.location) : undefined,
+    result: String(data.result || '參賽'),
+    teamSize: data.teamSize ? Number(data.teamSize) : undefined,
+    role: data.role ? String(data.role) : undefined,
+    technologies: Array.isArray(data.technologies) ? data.technologies as string[] : [],
+    certificateUrl: data.certificateUrl ? String(data.certificateUrl) : undefined,
+    certificateFile: data.certificateFile as LocalCompetition['certificateFile'],
+    projectUrl: data.projectUrl ? String(data.projectUrl) : undefined,
+    featured: Boolean(data.featured !== false),
+    createdAt: String(data.createdAt || new Date().toISOString())
+  });
+
   const loadCompetitions = async () => {
     try {
       const competitionData = await adminApi.getCompetitions();
-      setCompetitions(competitionData || []);
+      const localCompetitions = (competitionData || []).map(convertToLocalCompetition);
+      setCompetitions(localCompetitions);
     } catch {
       logger.error('Failed to load competitions:');
+      setCompetitions([]);
     }
   };
 
@@ -111,7 +159,7 @@ export default function CompetitionsPage() {
     }
   };
 
-  const startEdit = (competition?: CompetitionType) => {
+  const startEdit = (competition?: LocalCompetition) => {
     if (competition) {
       setEditingCompetition(competition);
       setTechInput(competition.technologies?.join(', ') || '');
