@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { useScroll } from '../../hooks/useScroll';
 import { cn } from '../../lib/utils';
+import { adminApi } from '../../lib/adminApi';
+import { logger } from '../../lib/logger';
 import Button from './Button';
 
 const navItems = [
@@ -17,12 +19,28 @@ const navItems = [
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userName, setUserName] = useState('謝長諺'); // 預設值
   const { scrollY, scrollDirection } = useScroll();
   const [activeSection, setActiveSection] = useState('home');
 
   const isVisible = scrollY < 100 || scrollDirection === 'up';
 
   useEffect(() => {
+    // Load user data
+    const loadUserData = async () => {
+      try {
+        const userData = await adminApi.getUserInfo();
+        logger.log('Navigation loaded user data:', userData);
+        if (userData && userData.name) {
+          setUserName(userData.name);
+        }
+      } catch (error) {
+        logger.error('Failed to load user info in Navigation:', error);
+      }
+    };
+
+    loadUserData();
+
     const handleSectionChange = () => {
       const sections = navItems.map(item => item.href.substring(1));
       const scrollPosition = window.scrollY + 100;
@@ -70,7 +88,7 @@ export default function Navigation() {
             className="flex-shrink-0"
           >
             <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              謝長諺
+              {userName}
             </h1>
           </motion.div>
 

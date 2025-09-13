@@ -124,9 +124,19 @@ export default function FileUpload({
           animate={{ opacity: 1, y: 0 }}
           className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              {getFileIcon(currentFile.type)}
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-3">
+              {currentFile.type.startsWith('image/') ? (
+                <div className="flex-shrink-0">
+                  <img
+                    src={adminApi.getFileDataUrl(currentFile)}
+                    alt={currentFile.name}
+                    className="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                  />
+                </div>
+              ) : (
+                getFileIcon(currentFile.type)
+              )}
               <div>
                 <p className="font-medium text-gray-900">{currentFile.name}</p>
                 <p className="text-sm text-gray-500">

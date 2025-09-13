@@ -65,14 +65,13 @@ export interface BlogPost {
 
 export interface Competition {
   id: string;
-  title: string;
+  name: string; // 統一使用 name 作為競賽名稱
   description: string;
   organizer: string;
   category: string; // 競賽類別：技術創新、商業競賽、學術競賽等
   date: string;
   location?: string;
-  result: string; // 獲獎結果：冠軍、亞軍、優選等
-  award?: string; // 獎項名稱
+  result: string; // 統一使用 result 作為獲獎結果：金牌、銀牌、銅牌等
   teamSize?: number; // 團隊人數
   role?: string; // 在團隊中的角色
   technologies?: string[]; // 使用的技術

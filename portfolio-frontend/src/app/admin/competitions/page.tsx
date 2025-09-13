@@ -154,8 +154,10 @@ export default function CompetitionsPage() {
       const apiData = convertToApiFormat(editingCompetition) as Record<string, unknown>;
 
       const success = editingCompetition.id
-        ? await adminApi.updateCompetition(apiData)
-        : await adminApi.createCompetition(apiData);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ? await adminApi.updateCompetition(apiData as any)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        : await adminApi.createCompetition(apiData as any);
 
       if (success) {
         await loadCompetitions();

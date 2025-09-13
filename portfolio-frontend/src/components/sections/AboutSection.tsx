@@ -52,7 +52,7 @@ export default function AboutSection() {
     name: "謝長諺",
     email: "changyen26@gmail.com",
     phone: "+886 912 345 678",
-    title: "全端工程師",
+    title: "",
     description: "專精於現代化網頁開發，擁有豐富的前端和後端開發經驗",
     github: "https://github.com/changyen26",
     linkedin: "https://linkedin.com/in/changyen",
