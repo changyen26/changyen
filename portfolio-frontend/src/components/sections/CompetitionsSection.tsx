@@ -13,16 +13,17 @@ import { adminApi } from '../../lib/adminApi';
 export default function CompetitionsSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });
   const [competitions, setCompetitions] = useState<Competition[]>([]);
+  const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const loadCompetitions = async () => {
       try {
         const competitionsData = await adminApi.getCompetitions();
-        // 只顯示精選的競賽，並按日期排序
-        const featuredCompetitions = competitionsData
-          .filter(comp => comp.featured)
+        // 顯示所有競賽，並按日期排序 (最新的在前)
+        const sortedCompetitions = competitionsData
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        setCompetitions(featuredCompetitions || []);
+        setCompetitions(sortedCompetitions || []);
       } catch (error) {
         logger.error('Failed to load competitions:', error);
         setCompetitions([]);
@@ -54,11 +55,11 @@ export default function CompetitionsSection() {
 
   const getRankColor = (result: string) => {
     switch (result) {
-      case '冠軍':
+      case '金牌': case '冠軍':
         return 'from-yellow-400 to-yellow-600';
-      case '亞軍':
+      case '銀牌': case '亞軍':
         return 'from-gray-400 to-gray-600';
-      case '季軍':
+      case '銅牌': case '季軍':
         return 'from-orange-400 to-orange-600';
       case '優選':
       case '佳作':
@@ -70,6 +71,36 @@ export default function CompetitionsSection() {
       default:
         return 'from-indigo-400 to-indigo-600';
     }
+  };
+
+  // 計算詳細統計資料
+  const getDetailedStats = () => {
+    const stats = {
+      總計: competitions.length,
+      金牌: competitions.filter(c => c.result === '金牌' || c.result === '冠軍').length,
+      銀牌: competitions.filter(c => c.result === '銀牌' || c.result === '亞軍').length,
+      銅牌: competitions.filter(c => c.result === '銅牌' || c.result === '季軍').length,
+      優選: competitions.filter(c => c.result === '優選').length,
+      佳作: competitions.filter(c => c.result === '佳作').length,
+      入圍: competitions.filter(c => c.result === '入圍').length,
+      特別獎: competitions.filter(c => c.result === '特別獎').length,
+      其他: competitions.filter(c => !['金牌', '冠軍', '銀牌', '亞軍', '銅牌', '季軍', '優選', '佳作', '入圍', '特別獎'].includes(c.result)).length
+    };
+    return stats;
+  };
+
+  const detailedStats = getDetailedStats();
+
+  const handleCompetitionClick = (competition: Competition) => {
+    if (competition.certificateFile || competition.certificateUrl) {
+      setSelectedCompetition(competition);
+      setShowModal(true);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedCompetition(null);
   };
 
   return (
@@ -95,9 +126,49 @@ export default function CompetitionsSection() {
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             競賽成就
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
             在國際舞台上展現創新實力，每一個獎項都是對技術能力的肯定
           </p>
+
+          {/* 競賽統計總覽 */}
+          {competitions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="text-center"
+            >
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                  <div className="text-3xl font-bold text-yellow-600 mb-2">
+                    {detailedStats.金牌}
+                  </div>
+                  <div className="text-gray-600">金獎</div>
+                </div>
+
+                <div>
+                  <div className="text-3xl font-bold text-gray-600 mb-2">
+                    {detailedStats.銀牌}
+                  </div>
+                  <div className="text-gray-600">銀獎</div>
+                </div>
+
+                <div>
+                  <div className="text-3xl font-bold text-orange-600 mb-2">
+                    {detailedStats.銅牌}
+                  </div>
+                  <div className="text-gray-600">銅獎</div>
+                </div>
+
+                <div>
+                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                    {detailedStats.總計}
+                  </div>
+                  <div className="text-gray-600">總獲獎</div>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* 成就時間線 */}
@@ -127,30 +198,38 @@ export default function CompetitionsSection() {
                 }`}
               >
                 <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8' : 'pl-8'}`}>
-                  <Card className="p-8 group hover:shadow-2xl">
+                  <Card 
+                    className={`p-8 group hover:shadow-2xl ${
+                      (competition.certificateFile || competition.certificateUrl) 
+                        ? 'cursor-pointer hover:scale-105 transition-transform duration-200' 
+                        : ''
+                    }`}
+                    onClick={() => handleCompetitionClick(competition)}
+                  >
                     <div className="flex items-start justify-between mb-6">
                       <div className={`p-3 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} text-white shadow-lg`}>
                         <Trophy size={24} />
                       </div>
                       
                       {(competition.certificateUrl || competition.certificateFile) && (
-                        <motion.a
-                          href={competition.certificateFile ? 
-                            adminApi.getFileDataUrl(competition.certificateFile) : 
-                            competition.certificateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 hover:bg-gray-100 rounded-full"
+                        <motion.div
+                          className="opacity-70 group-hover:opacity-100 transition-opacity duration-200 p-2 bg-blue-100 rounded-full"
                           whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
                         >
-                          <ExternalLink size={20} className="text-gray-500" />
-                        </motion.a>
+                          <svg 
+                            className="w-5 h-5 text-blue-600" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </motion.div>
                       )}
                     </div>
 
                     <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      {competition.title}
+                      {competition.name}
                     </h3>
 
                     <div className="flex items-center gap-4 mb-4">
@@ -211,44 +290,117 @@ export default function CompetitionsSection() {
           </div>
         )}
 
-        {/* 統計摘要 */}
-        {competitions.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 1 }}
-            className="mt-20 text-center"
+
+        {/* 證書模態對話框 */}
+        {showModal && selectedCompetition && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={closeModal}
           >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div>
-                <div className="text-3xl font-bold text-yellow-600 mb-2">
-                  {competitions.filter(c => c.result && (c.result.includes('冠軍') || c.result.includes('金') || c.result.includes('1'))).length}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="bg-white rounded-lg shadow-2xl max-w-4xl max-h-[90vh] overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {selectedCompetition.name}
+                    </h3>
+                    <p className="text-gray-600">{selectedCompetition.organizer}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedCompetition.result === '金牌' || selectedCompetition.result === '冠軍' 
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : selectedCompetition.result === '銀牌' || selectedCompetition.result === '亞軍'
+                          ? 'bg-gray-100 text-gray-800'
+                          : selectedCompetition.result === '銅牌' || selectedCompetition.result === '季軍'
+                          ? 'bg-orange-100 text-orange-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {selectedCompetition.result}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {formatDate(selectedCompetition.date)}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={closeModal}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="text-gray-600">金獎</div>
+
+                {selectedCompetition.description && (
+                  <p className="text-gray-700 mb-6 leading-relaxed">
+                    {selectedCompetition.description}
+                  </p>
+                )}
+
+                {/* 證書顯示 */}
+                {selectedCompetition.certificateFile && (
+                  <div className="mb-4">
+                    {selectedCompetition.certificateFile.type.startsWith('image/') ? (
+                      <img
+                        src={adminApi.getFileDataUrl(selectedCompetition.certificateFile)}
+                        alt="競賽證書"
+                        className="w-full max-w-3xl mx-auto rounded-lg shadow-lg"
+                      />
+                    ) : selectedCompetition.certificateFile.type === 'application/pdf' ? (
+                      <div className="text-center py-8">
+                        <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p className="text-gray-700 mb-4">PDF 證書文件</p>
+                        <button
+                          onClick={() => {
+                            const url = adminApi.getFileDataUrl(selectedCompetition.certificateFile!);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = selectedCompetition.certificateFile!.name;
+                            link.click();
+                          }}
+                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          下載 PDF
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+
+                {selectedCompetition.certificateUrl && !selectedCompetition.certificateFile && (
+                  <div className="text-center py-8">
+                    <button
+                      onClick={() => window.open(selectedCompetition.certificateUrl, '_blank')}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      查看證書連結
+                    </button>
+                  </div>
+                )}
+
+
+                {selectedCompetition.projectUrl && (
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={() => window.open(selectedCompetition.projectUrl, '_blank')}
+                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    >
+                      查看專案
+                    </button>
+                  </div>
+                )}
               </div>
-              
-              <div>
-                <div className="text-3xl font-bold text-gray-600 mb-2">
-                  {competitions.filter(c => c.result && (c.result.includes('亞軍') || c.result.includes('銀') || c.result.includes('2'))).length}
-                </div>
-                <div className="text-gray-600">銀獎</div>
-              </div>
-              
-              <div>
-                <div className="text-3xl font-bold text-orange-600 mb-2">
-                  {competitions.filter(c => c.result && (c.result.includes('季軍') || c.result.includes('銅') || c.result.includes('3'))).length}
-                </div>
-                <div className="text-gray-600">銅獎</div>
-              </div>
-              
-              <div>
-                <div className="text-3xl font-bold text-blue-600 mb-2">
-                  {competitions.length}
-                </div>
-                <div className="text-gray-600">總獲獎</div>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
       </div>
     </section>

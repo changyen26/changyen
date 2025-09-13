@@ -87,12 +87,12 @@ def create_app(config_name=None):
         r"/api/*": {
             "origins": app.config['CORS_ORIGINS'],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
+            "allow_headers": ["Content-Type", "Authorization", "Cache-Control", "Pragma"]
         },
         r"/auth/*": {
             "origins": app.config['CORS_ORIGINS'],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
+            "allow_headers": ["Content-Type", "Authorization", "Cache-Control", "Pragma"]
         }
     })
     migrate = Migrate(app, db)
@@ -259,11 +259,11 @@ def register_routes(app):
                 except:
                     competition_date = None
             
-            # 創建競賽記錄
+            # 創建競賽記錄 - 使用自動遞增 ID
             competition = Competition(
-                id=str(uuid.uuid4()),
                 user_id=user.id,
-                name=data.get('name'),
+                name=data.get('name', ''),
+                competition_name=data.get('name', ''),  # 同時設置數據庫中的實際欄位
                 result=data.get('result', '參賽'),
                 description=data.get('description', ''),
                 date=competition_date,
@@ -272,7 +272,6 @@ def register_routes(app):
                 featured=data.get('featured', True),
                 organizer=data.get('organizer', ''),
                 location=data.get('location', ''),
-                award=data.get('award', ''),
                 team_size=data.get('teamSize', 1),
                 role=data.get('role', ''),
                 project_url=data.get('projectUrl', '')
@@ -315,7 +314,7 @@ def register_routes(app):
             update_fields = [
                 'name', 'result', 'description', 'certificate_url', 
                 'category', 'featured', 'organizer', 'location', 
-                'award', 'team_size', 'role', 'project_url'
+                'team_size', 'role', 'project_url'
             ]
             
             for field in update_fields:
@@ -326,9 +325,12 @@ def register_routes(app):
                     api_field = 'teamSize'
                 elif field == 'project_url':
                     api_field = 'projectUrl'
-                
+
                 if api_field in data:
                     setattr(competition, field, data[api_field])
+                    # 特別處理 name 欄位，同時更新 competition_name
+                    if field == 'name':
+                        competition.competition_name = data[api_field]
             
             # 更新技術列表
             if 'technologies' in data:
@@ -1115,7 +1117,6 @@ def init_default_data():
                 "category": "技術創新",
                 "organizer": "科技部",
                 "location": "台北市信義區",
-                "award": "最佳技術創新獎",
                 "team_size": 4,
                 "role": "技術負責人",
                 "project_url": "https://github.com/example/project",
@@ -1129,7 +1130,6 @@ def init_default_data():
                 "category": "程式設計",
                 "organizer": "教育部",
                 "location": "台中市",
-                "award": "亞軍獎",
                 "team_size": 3,
                 "role": "隊長",
                 "technologies": ["C++", "Python", "Algorithm"]
@@ -1139,9 +1139,9 @@ def init_default_data():
         for comp_data in competitions_data:
             comp_date = datetime.strptime(comp_data['date'], '%Y-%m-%d').date()
             competition = Competition(
-                id=str(uuid.uuid4()),
                 user_id=user.id,
                 name=comp_data['name'],
+                competition_name=comp_data['name'],
                 result=comp_data['result'],
                 description=comp_data['description'],
                 date=comp_date,
@@ -1149,7 +1149,6 @@ def init_default_data():
                 featured=True,
                 organizer=comp_data['organizer'],
                 location=comp_data['location'],
-                award=comp_data['award'],
                 team_size=comp_data['team_size'],
                 role=comp_data['role'],
                 project_url=comp_data.get('project_url', '')

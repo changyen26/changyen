@@ -23,9 +23,9 @@ const COMPETITION_CATEGORIES = [
 ];
 
 const COMPETITION_RESULTS = [
-  '冠軍',
-  '亞軍',
-  '季軍',
+  '金牌',
+  '銀牌',
+  '銅牌',
   '優選',
   '佳作',
   '入圍',
@@ -38,14 +38,13 @@ export default function CompetitionsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingCompetition, setEditingCompetition] = useState<Competition>({
     id: '',
-    title: '',
+    name: '',  // 統一使用 name
     description: '',
     organizer: '',
     category: '技術創新',
     date: '',
     location: '',
-    result: '參賽',
-    award: '',
+    result: '金牌',
     teamSize: 1,
     role: '',
     technologies: [],
@@ -72,7 +71,7 @@ export default function CompetitionsPage() {
 
   const handleSave = async () => {
     try {
-      if (!editingCompetition.title || !editingCompetition.date) {
+      if (!editingCompetition.name || !editingCompetition.date) {
         alert('請填寫競賽名稱和日期！');
         return;
       }
@@ -116,14 +115,13 @@ export default function CompetitionsPage() {
     } else {
       setEditingCompetition({
         id: '',
-        title: '',
+        name: '',  // 統一使用 name
         description: '',
         organizer: '',
         category: '技術創新',
         date: '',
         location: '',
-        result: '參賽',
-        award: '',
+        result: '金牌',
         teamSize: 1,
         role: '',
         technologies: [],
@@ -142,14 +140,13 @@ export default function CompetitionsPage() {
     setIsEditing(false);
     setEditingCompetition({
       id: '',
-      title: '',
+      name: '',  // 統一使用 name
       description: '',
       organizer: '',
       category: '技術創新',
       date: '',
       location: '',
-      result: '參賽',
-      award: '',
+      result: '金牌',
       teamSize: 1,
       role: '',
       technologies: [],
@@ -174,11 +171,53 @@ export default function CompetitionsPage() {
     return new Date(dateString).toLocaleDateString('zh-TW');
   };
 
+  // 計算得獎統計資料
+  const getAwardsStatistics = () => {
+    const stats = {
+      總計: 0,
+      金牌: 0,
+      銀牌: 0,
+      銅牌: 0,
+      優選: 0,
+      佳作: 0,
+      入圍: 0,
+      特別獎: 0,
+      其他: 0
+    };
+
+    competitions.forEach(competition => {
+      stats.總計++;
+      const result = competition.result;
+
+      if (result === '金牌' || result === '冠軍') {
+        stats.金牌++;
+      } else if (result === '銀牌' || result === '亞軍') {
+        stats.銀牌++;
+      } else if (result === '銅牌' || result === '季軍') {
+        stats.銅牌++;
+      } else if (result === '優選') {
+        stats.優選++;
+      } else if (result === '佳作') {
+        stats.佳作++;
+      } else if (result === '入圍') {
+        stats.入圍++;
+      } else if (result === '特別獎') {
+        stats.特別獎++;
+      } else {
+        stats.其他++;
+      }
+    });
+
+    return stats;
+  };
+
+  const awardsStats = getAwardsStatistics();
+
   const getResultColor = (result: string) => {
     switch (result) {
-      case '冠軍': return 'bg-yellow-100 text-yellow-800';
-      case '亞軍': return 'bg-gray-100 text-gray-800';
-      case '季軍': return 'bg-orange-100 text-orange-800';
+      case '金牌': case '冠軍': return 'bg-yellow-100 text-yellow-800';
+      case '銀牌': case '亞軍': return 'bg-gray-100 text-gray-800';
+      case '銅牌': case '季軍': return 'bg-orange-100 text-orange-800';
       case '優選': case '佳作': return 'bg-blue-100 text-blue-800';
       case '入圍': return 'bg-green-100 text-green-800';
       case '特別獎': return 'bg-purple-100 text-purple-800';
@@ -242,8 +281,8 @@ export default function CompetitionsPage() {
                   </label>
                   <input
                     type="text"
-                    value={editingCompetition.title}
-                    onChange={(e) => setEditingCompetition({...editingCompetition, title: e.target.value})}
+                    value={editingCompetition.name || ''}
+                    onChange={(e) => setEditingCompetition({...editingCompetition, name: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="例如：全國大學生創新創業競賽"
                   />
@@ -255,7 +294,7 @@ export default function CompetitionsPage() {
                   </label>
                   <input
                     type="text"
-                    value={editingCompetition.organizer}
+                    value={editingCompetition.organizer || ''}
                     onChange={(e) => setEditingCompetition({...editingCompetition, organizer: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="例如：教育部、科技部"
@@ -267,7 +306,7 @@ export default function CompetitionsPage() {
                     競賽類別
                   </label>
                   <select
-                    value={editingCompetition.category}
+                    value={editingCompetition.category || ''}
                     onChange={(e) => setEditingCompetition({...editingCompetition, category: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -285,7 +324,7 @@ export default function CompetitionsPage() {
                   </label>
                   <input
                     type="date"
-                    value={editingCompetition.date}
+                    value={editingCompetition.date || ''}
                     onChange={(e) => setEditingCompetition({...editingCompetition, date: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -309,7 +348,7 @@ export default function CompetitionsPage() {
                     參賽結果
                   </label>
                   <select
-                    value={editingCompetition.result}
+                    value={editingCompetition.result || ''}
                     onChange={(e) => setEditingCompetition({...editingCompetition, result: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -321,18 +360,6 @@ export default function CompetitionsPage() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    獎項名稱
-                  </label>
-                  <input
-                    type="text"
-                    value={editingCompetition.award || ''}
-                    onChange={(e) => setEditingCompetition({...editingCompetition, award: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="例如：最佳技術獎、創新獎"
-                  />
-                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -401,7 +428,7 @@ export default function CompetitionsPage() {
                     競賽描述
                   </label>
                   <textarea
-                    value={editingCompetition.description}
+                    value={editingCompetition.description || ''}
                     onChange={(e) => setEditingCompetition({...editingCompetition, description: e.target.value})}
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -425,6 +452,69 @@ export default function CompetitionsPage() {
           </motion.div>
         )}
 
+        {/* 得獎統計資料 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="mb-8"
+        >
+          <Card className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">得獎統計</h2>
+              <span className="text-sm text-gray-500">共 {awardsStats.總計} 項競賽</span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+              {Object.entries(awardsStats).filter(([key]) => key !== '總計').map(([award, count]) => {
+                let colorClass = 'bg-gray-100 text-gray-800';
+                let iconClass = '📊';
+
+                switch (award) {
+                  case '金牌':
+                    colorClass = 'bg-yellow-100 text-yellow-800';
+                    iconClass = '🥇';
+                    break;
+                  case '銀牌':
+                    colorClass = 'bg-gray-100 text-gray-800';
+                    iconClass = '🥈';
+                    break;
+                  case '銅牌':
+                    colorClass = 'bg-orange-100 text-orange-800';
+                    iconClass = '🥉';
+                    break;
+                  case '優選':
+                    colorClass = 'bg-blue-100 text-blue-800';
+                    iconClass = '🏆';
+                    break;
+                  case '佳作':
+                    colorClass = 'bg-green-100 text-green-800';
+                    iconClass = '🎖️';
+                    break;
+                  case '入圍':
+                    colorClass = 'bg-purple-100 text-purple-800';
+                    iconClass = '🎯';
+                    break;
+                  case '特別獎':
+                    colorClass = 'bg-pink-100 text-pink-800';
+                    iconClass = '⭐';
+                    break;
+                  default:
+                    iconClass = '🏅';
+                }
+
+                return (
+                  <div key={award} className={`p-3 rounded-lg ${colorClass} text-center transition-all hover:scale-105`}>
+                    <div className="text-2xl mb-1">{iconClass}</div>
+                    <div className="font-semibold text-lg">{count}</div>
+                    <div className="text-xs opacity-75">{award}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </motion.div>
+
         {/* 競賽列表 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -443,7 +533,7 @@ export default function CompetitionsPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        {competition.title}
+                        {competition.name}
                         {competition.featured && (
                           <span className="ml-2 inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
                             精選
@@ -466,10 +556,6 @@ export default function CompetitionsPage() {
                       </span>
                     </div>
                   </div>
-                  
-                  {competition.award && (
-                    <p className="text-sm font-medium text-gray-900 mb-2">🏆 {competition.award}</p>
-                  )}
                   
                   {competition.description && (
                     <p className="text-gray-600 text-sm mb-4 flex-1 line-clamp-3">

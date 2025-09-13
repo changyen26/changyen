@@ -54,20 +54,20 @@ class Competition(db.Model):
     """競賽模型"""
     __tablename__ = 'competitions'
     
-    id = db.Column(db.String(36), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    name = db.Column(db.String(200), nullable=False)
-    result = db.Column(db.String(100))
+    name = db.Column(db.String(200), nullable=False)  # 競賽名稱（主要欄位）
+    competition_name = db.Column(db.String(200), nullable=False)  # 向下相容欄位，與 name 同步
+    result = db.Column(db.String(100))  # 獲獎結果：金牌、銀牌、銅牌等
     description = db.Column(db.Text)
     date = db.Column(db.Date)
     certificate_url = db.Column(db.String(255))
-    category = db.Column(db.String(100), default='技術競賽')
+    category = db.Column(db.String(100), default='技術創新')
     featured = db.Column(db.Boolean, default=True)
     
     # 新增欄位
     organizer = db.Column(db.String(200))  # 主辦單位
     location = db.Column(db.String(200))   # 舉辦地點
-    award = db.Column(db.String(200))      # 獎項名稱
     team_size = db.Column(db.Integer, default=1)  # 團隊人數
     role = db.Column(db.String(100))       # 團隊角色
     project_url = db.Column(db.String(255))  # 專案連結
@@ -89,25 +89,34 @@ class Competition(db.Model):
         """設置技術列表"""
         self.technologies = json.dumps(tech_list) if tech_list else '[]'
     
-    def to_dict(self):
-        return {
-            'id': self.id,
+    def to_dict(self, include_file_data=False):
+        """轉換為字典格式
+        Args:
+            include_file_data: 是否包含證書文件數據
+        """
+        result = {
+            'id': str(self.id),
             'name': self.name,
             'result': self.result,
-            'description': self.description,
+            'description': self.description or '',
             'date': self.date.isoformat() if self.date else None,
-            'certificateUrl': self.certificate_url,
-            'category': self.category,
-            'featured': self.featured,
-            'organizer': self.organizer,
-            'location': self.location,
-            'award': self.award,
-            'teamSize': self.team_size,
-            'role': self.role,
-            'projectUrl': self.project_url,
+            'certificateUrl': self.certificate_url or '',
+            'category': self.category or '技術創新',
+            'featured': bool(self.featured),
+            'organizer': self.organizer or '',
+            'location': self.location or '',
+            'teamSize': self.team_size or 1,
+            'role': self.role or '',
+            'projectUrl': self.project_url or '',
             'technologies': self.get_technologies(),
             'createdAt': self.created_at.isoformat() if self.created_at else None
         }
+        
+        # 證書文件數據暫時設為 None，後續實現文件處理功能
+        if include_file_data:
+            result['certificateFile'] = None
+            
+        return result
 
 class Project(db.Model):
     """項目模型"""

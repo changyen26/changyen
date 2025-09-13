@@ -82,20 +82,17 @@ class AdminApiService {
   // 獲取用戶信息
   async getUserInfo(): Promise<UserInfo> {
     try {
-      // 優先讀取本地存儲的最新數據
-      const stored = localStorage.getItem(this.STORAGE_KEYS.USER_INFO);
-      logger.log('localStorage user data:', stored);
-      if (stored) {
-        const userData = JSON.parse(stored);
-        logger.log('Parsed localStorage data:', userData);
-        return userData;
-      }
-      
+      // 優先從 API 獲取最新資料，確保資料同步
       if (API_BASE_URL) {
-        // 如果沒有本地數據且有後端API，從後端獲取
         try {
           logger.log('Fetching user data from API:', `${API_BASE_URL}/api/v1/user`);
-          const response = await fetch(`${API_BASE_URL}/api/v1/user`);
+          const response = await fetch(`${API_BASE_URL}/api/v1/user`, {
+            // 添加快取破壞機制
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
           logger.log('API response status:', response.status, response.ok);
           if (response.ok) {
             const userData = await response.json();
@@ -105,19 +102,32 @@ class AdminApiService {
             return userData;
           }
         } catch (apiError) {
-          logger.log('Backend API failed, using default data:', apiError);
+          logger.log('Backend API failed, fallback to localStorage or default data:', apiError);
         }
       }
       
-      // 返回默認數據
+      // API 失敗時，嘗試從 localStorage 讀取快取資料
+      const stored = localStorage.getItem(this.STORAGE_KEYS.USER_INFO);
+      logger.log('Fallback to localStorage user data:', stored);
+      if (stored) {
+        try {
+          const userData = JSON.parse(stored);
+          logger.log('Using cached localStorage data:', userData);
+          return userData;
+        } catch (parseError) {
+          logger.error('Failed to parse localStorage data:', parseError);
+        }
+      }
+      
+      // 返回默認數據 (僅在 API 完全失效時使用)
       const defaultData = {
-        name: '謝長諺',
-        email: 'changyen26@gmail.com',
-        phone: '+886 912 345 678',
-        title: '全端開發工程師',
-        description: '專精於現代化網頁開發，擁有豐富的前端和後端開發經驗',
-        github: 'https://github.com/changyen26',
-        linkedin: 'https://linkedin.com/in/changyen',
+        name: '載入中...',
+        email: '載入中...',
+        phone: '載入中...',
+        title: '載入中...',
+        description: '載入中...',
+        github: '載入中...',
+        linkedin: '載入中...',
         avatar: '',
         location: '台灣',
         website: ''
@@ -785,7 +795,6 @@ class AdminApiService {
           featured?: boolean;
           organizer?: string;
           location?: string;
-          award?: string;
           teamSize?: number;
           role?: string;
           technologies?: string[];
@@ -793,7 +802,7 @@ class AdminApiService {
           createdAt?: string;
         }) => ({
           id: comp.id,
-          title: comp.name, // 後端的 name 映射為前端的 title
+          name: comp.name, // 後端的 name 映射為前端的 name
           result: comp.result,
           date: comp.date,
           description: comp.description,
@@ -802,7 +811,6 @@ class AdminApiService {
           featured: comp.featured !== false,
           organizer: comp.organizer || '', // 從後端載入實際資料
           location: comp.location || '',
-          award: comp.award || '',
           teamSize: comp.teamSize || 1,
           role: comp.role || '',
           technologies: comp.technologies || [],
@@ -824,13 +832,19 @@ class AdminApiService {
       if (API_BASE_URL) {
         // 只發送後端需要的欄位，映射前端和後端的欄位名稱
         const competitionData = {
-          name: competition.title || "",  // 前端使用 title，後端期望 name
+          name: competition.name || "",  // 前端使用 name，後端期望 name
           result: competition.result || "",
           description: competition.description || "",
           date: competition.date || "",
           certificateUrl: competition.certificateUrl || "",
           category: competition.category || "技術競賽",
-          featured: competition.featured !== false
+          featured: competition.featured !== false,
+          organizer: competition.organizer || "",
+          location: competition.location || "",
+          teamSize: competition.teamSize || 1,
+          role: competition.role || "",
+          projectUrl: competition.projectUrl || "",
+          technologies: competition.technologies || []
         };
 
         // 檢查必填欄位
@@ -878,7 +892,7 @@ class AdminApiService {
       if (API_BASE_URL) {
         // 映射前端數據格式到後端期望格式 - 包含所有表單欄位
         const competitionData = {
-          name: competition.title || "",
+          name: competition.name || "",  // 修復：使用 name 而不是 title
           result: competition.result || "",
           description: competition.description || "",
           date: competition.date || "",
@@ -887,7 +901,6 @@ class AdminApiService {
           featured: competition.featured !== false,
           organizer: competition.organizer || "",
           location: competition.location || "",
-          award: competition.award || "",
           teamSize: competition.teamSize || 1,
           role: competition.role || "",
           projectUrl: competition.projectUrl || "",
