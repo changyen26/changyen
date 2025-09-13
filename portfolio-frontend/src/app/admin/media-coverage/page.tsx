@@ -430,6 +430,7 @@ export default function MediaCoveragePage() {
           )}
         </Card>
       </div>
+      </div>
     </AdminProtection>
   );
 }

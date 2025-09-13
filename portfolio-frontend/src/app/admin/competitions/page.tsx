@@ -167,7 +167,7 @@ export default function CompetitionsPage() {
       console.log('💾 準備保存的競賽數據:', editingCompetition);
       console.log('💾 editingCompetition.projectImages:', editingCompetition.projectImages);
       console.log('💾 轉換後的 API 數據:', apiData);
-      console.log('💾 API數據中的projectImages:', (apiData as any).projectImages);
+      console.log('💾 API數據中的projectImages:', (apiData as Record<string, unknown>).projectImages);
       console.log('💾 作品圖片數量:', editingCompetition.projectImages?.length || 0);
 
       const success = editingCompetition.id
