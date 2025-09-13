@@ -36,9 +36,10 @@ const COMPETITION_RESULTS = [
 export default function CompetitionsPage() {
   const [competitions, setCompetitions] = useState<CompetitionType[]>([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingCompetition, setEditingCompetition] = useState<CompetitionType>({
+  // 明確定義初始競賽對象
+  const createEmptyCompetition = (): CompetitionType => ({
     id: '',
-    name: '',  // 統一使用 name
+    name: '',
     description: '',
     organizer: '',
     category: '技術創新',
@@ -54,6 +55,8 @@ export default function CompetitionsPage() {
     featured: false,
     createdAt: new Date().toISOString()
   });
+
+  const [editingCompetition, setEditingCompetition] = useState(createEmptyCompetition());
   const [techInput, setTechInput] = useState('');
 
   useEffect(() => {
@@ -113,24 +116,7 @@ export default function CompetitionsPage() {
       setEditingCompetition(competition);
       setTechInput(competition.technologies?.join(', ') || '');
     } else {
-      setEditingCompetition({
-        id: '',
-        name: '',  // 統一使用 name
-        description: '',
-        organizer: '',
-        category: '技術創新',
-        date: '',
-        location: '',
-        result: '金牌',
-        teamSize: 1,
-        role: '',
-        technologies: [],
-        certificateUrl: '',
-        certificateFile: undefined,
-        projectUrl: '',
-        featured: false,
-        createdAt: new Date().toISOString()
-      });
+      setEditingCompetition(createEmptyCompetition());
       setTechInput('');
     }
     setIsEditing(true);
@@ -138,24 +124,7 @@ export default function CompetitionsPage() {
 
   const resetForm = () => {
     setIsEditing(false);
-    setEditingCompetition({
-      id: '',
-      name: '',  // 統一使用 name
-      description: '',
-      organizer: '',
-      category: '技術創新',
-      date: '',
-      location: '',
-      result: '金牌',
-      teamSize: 1,
-      role: '',
-      technologies: [],
-      certificateUrl: '',
-      certificateFile: undefined,
-      projectUrl: '',
-      featured: false,
-      createdAt: new Date().toISOString()
-    });
+    setEditingCompetition(createEmptyCompetition());
     setTechInput('');
   };
 
