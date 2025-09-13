@@ -121,12 +121,12 @@ export default function CompetitionsSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="text-center mb-16"
+          className="text-center mb-12 md:mb-16 px-4 md:px-0"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 md:mb-6">
             競賽成就
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 md:mb-12 leading-relaxed">
             在國際舞台上展現創新實力，每一個獎項都是對技術能力的肯定
           </p>
 
@@ -138,33 +138,33 @@ export default function CompetitionsSection() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="text-center"
             >
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div>
-                  <div className="text-3xl font-bold text-yellow-600 mb-2">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow">
+                  <div className="text-2xl md:text-3xl font-bold text-yellow-600 mb-1 md:mb-2">
                     {detailedStats.金牌}
                   </div>
-                  <div className="text-gray-600">金獎</div>
+                  <div className="text-sm md:text-base text-gray-600">金獎</div>
                 </div>
 
-                <div>
-                  <div className="text-3xl font-bold text-gray-600 mb-2">
+                <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow">
+                  <div className="text-2xl md:text-3xl font-bold text-gray-600 mb-1 md:mb-2">
                     {detailedStats.銀牌}
                   </div>
-                  <div className="text-gray-600">銀獎</div>
+                  <div className="text-sm md:text-base text-gray-600">銀獎</div>
                 </div>
 
-                <div>
-                  <div className="text-3xl font-bold text-orange-600 mb-2">
+                <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow">
+                  <div className="text-2xl md:text-3xl font-bold text-orange-600 mb-1 md:mb-2">
                     {detailedStats.銅牌}
                   </div>
-                  <div className="text-gray-600">銅獎</div>
+                  <div className="text-sm md:text-base text-gray-600">銅獎</div>
                 </div>
 
-                <div>
-                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow">
+                  <div className="text-2xl md:text-3xl font-bold text-blue-600 mb-1 md:mb-2">
                     {detailedStats.總計}
                   </div>
-                  <div className="text-gray-600">總獲獎</div>
+                  <div className="text-sm md:text-base text-gray-600">總獲獎</div>
                 </div>
               </div>
             </motion.div>
@@ -174,9 +174,18 @@ export default function CompetitionsSection() {
         {/* 成就時間線 */}
         {competitions.length > 0 ? (
           <div className="relative">
-            {/* 時間線主軸 */}
+            {/* 桌面版時間線主軸 */}
             <motion.div
-              className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-gradient-to-b from-blue-400 to-purple-600 rounded-full"
+              className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-gradient-to-b from-blue-400 to-purple-600 rounded-full hidden md:block"
+              style={{ height: '100%' }}
+              initial={{ scaleY: 0 }}
+              animate={isInView ? { scaleY: 1 } : {}}
+              transition={{ duration: 1.5, ease: 'easeInOut' }}
+            />
+
+            {/* 手機版時間線主軸 */}
+            <motion.div
+              className="absolute left-6 w-0.5 bg-gradient-to-b from-blue-400 to-purple-600 rounded-full md:hidden"
               style={{ height: '100%' }}
               initial={{ scaleY: 0 }}
               animate={isInView ? { scaleY: 1 } : {}}
@@ -187,21 +196,22 @@ export default function CompetitionsSection() {
               variants={timelineVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
-              className="space-y-16"
+              className="space-y-12 md:space-y-16"
             >
               {competitions.map((competition, index) => (
               <motion.div
                 key={competition.id}
                 variants={itemVariants}
                 className={`flex items-center ${
-                  index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
-                }`}
+                  index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                } flex-row`}
               >
-                <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8' : 'pl-8'}`}>
-                  <Card 
+                {/* 桌面版卡片佈局 */}
+                <div className={`hidden md:block w-1/2 ${index % 2 === 0 ? 'pr-8' : 'pl-8'}`}>
+                  <Card
                     className={`p-8 group hover:shadow-2xl ${
-                      (competition.certificateFile || competition.certificateUrl) 
-                        ? 'cursor-pointer hover:scale-105 transition-transform duration-200' 
+                      (competition.certificateFile || competition.certificateUrl)
+                        ? 'cursor-pointer hover:scale-105 transition-transform duration-200'
                         : ''
                     }`}
                     onClick={() => handleCompetitionClick(competition)}
@@ -210,16 +220,16 @@ export default function CompetitionsSection() {
                       <div className={`p-3 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} text-white shadow-lg`}>
                         <Trophy size={24} />
                       </div>
-                      
+
                       {(competition.certificateUrl || competition.certificateFile) && (
                         <motion.div
                           className="opacity-70 group-hover:opacity-100 transition-opacity duration-200 p-2 bg-blue-100 rounded-full"
                           whileHover={{ scale: 1.1 }}
                         >
-                          <svg 
-                            className="w-5 h-5 text-blue-600" 
-                            fill="none" 
-                            stroke="currentColor" 
+                          <svg
+                            className="w-5 h-5 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -232,12 +242,12 @@ export default function CompetitionsSection() {
                       {competition.name}
                     </h3>
 
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className={`px-4 py-2 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} text-white font-medium`}>
+                    <div className="flex items-center gap-4 mb-4 flex-wrap">
+                      <div className={`px-4 py-2 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} text-white font-medium text-sm`}>
                         <Medal size={16} className="inline mr-2" />
                         {competition.result}
                       </div>
-                      
+
                       {competition.category && (
                         <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
                           {competition.category}
@@ -256,9 +266,103 @@ export default function CompetitionsSection() {
                   </Card>
                 </div>
 
-                {/* 時間線節點 */}
+                {/* 手機版卡片佈局 */}
+                <div className="md:hidden flex-1 ml-14 mr-4">
+                  <Card
+                    className={`p-4 group hover:shadow-lg ${
+                      (competition.certificateFile || competition.certificateUrl)
+                        ? 'cursor-pointer hover:scale-[1.02] transition-all duration-300'
+                        : ''
+                    } border-l-4 ${getRankColor(competition.result).includes('yellow') ? 'border-yellow-400' :
+                      getRankColor(competition.result).includes('gray') ? 'border-gray-400' :
+                      getRankColor(competition.result).includes('orange') ? 'border-orange-400' :
+                      getRankColor(competition.result).includes('blue') ? 'border-blue-400' :
+                      getRankColor(competition.result).includes('purple') ? 'border-purple-400' :
+                      getRankColor(competition.result).includes('green') ? 'border-green-400' : 'border-indigo-400'}`}
+                    onClick={() => handleCompetitionClick(competition)}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className={`p-2 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} text-white shadow-md flex-shrink-0`}>
+                        <Trophy size={18} />
+                      </div>
+
+                      {(competition.certificateUrl || competition.certificateFile) && (
+                        <motion.div
+                          className="opacity-60 group-hover:opacity-100 transition-opacity duration-200 p-1 bg-blue-50 rounded-full flex-shrink-0 ml-2"
+                          whileHover={{ scale: 1.1 }}
+                        >
+                          <svg
+                            className="w-3.5 h-3.5 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    <h3 className="text-base font-bold text-gray-900 mb-2 leading-tight pr-2">
+                      {competition.name}
+                    </h3>
+
+                    <div className="space-y-2 mb-3">
+                      <div className={`inline-flex items-center px-2.5 py-1 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} text-white font-medium text-xs`}>
+                        <Medal size={12} className="mr-1" />
+                        {competition.result}
+                      </div>
+
+                      {competition.category && (
+                        <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full w-fit">
+                          {competition.category}
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-gray-600 mb-3 leading-relaxed text-xs line-clamp-3">
+                      {competition.description}
+                    </p>
+
+                    <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                      <div className="flex items-center">
+                        <Calendar size={12} className="mr-1" />
+                        <span>{formatDate(competition.date)}</span>
+                      </div>
+
+                      {competition.organizer && (
+                        <div className="text-right text-xs text-gray-400 truncate ml-2 max-w-[120px]">
+                          {competition.organizer}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 手機版技術標籤 */}
+                    {competition.technologies && competition.technologies.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-gray-100">
+                        <div className="flex flex-wrap gap-1">
+                          {competition.technologies.slice(0, 2).map((tech, i) => (
+                            <span
+                              key={i}
+                              className="px-1.5 py-0.5 bg-purple-50 text-purple-700 text-xs rounded"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                          {competition.technologies.length > 2 && (
+                            <span className="text-xs text-gray-400">
+                              +{competition.technologies.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </Card>
+                </div>
+
+                {/* 桌面版時間線節點 */}
                 <motion.div
-                  className="relative z-10"
+                  className="relative z-10 hidden md:block"
                   initial={{ scale: 0 }}
                   animate={isInView ? { scale: 1 } : {}}
                   transition={{ duration: 0.5, delay: index * 0.3 }}
@@ -266,7 +370,7 @@ export default function CompetitionsSection() {
                   <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} shadow-xl flex items-center justify-center`}>
                     <Trophy size={24} className="text-white" />
                   </div>
-                  
+
                   {/* 脈衝效果 */}
                   <motion.div
                     className={`absolute inset-0 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} opacity-30`}
@@ -275,7 +379,26 @@ export default function CompetitionsSection() {
                   />
                 </motion.div>
 
-                <div className="w-1/2" />
+                {/* 手機版時間線節點 */}
+                <motion.div
+                  className="absolute left-6 transform -translate-x-1/2 z-10 md:hidden"
+                  initial={{ scale: 0 }}
+                  animate={isInView ? { scale: 1 } : {}}
+                  transition={{ duration: 0.5, delay: index * 0.3 }}
+                >
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} shadow-lg flex items-center justify-center border-2 border-white`}>
+                    <Trophy size={16} className="text-white" />
+                  </div>
+
+                  {/* 脈衝效果 */}
+                  <motion.div
+                    className={`absolute inset-0 rounded-full bg-gradient-to-r ${getRankColor(competition.result)} opacity-20`}
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0, 0.2] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}
+                  />
+                </motion.div>
+
+                <div className="hidden md:block w-1/2" />
               </motion.div>
             ))}
             </motion.div>
