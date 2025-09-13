@@ -89,24 +89,47 @@ export default function CompetitionsPage() {
     loadCompetitions();
   }, []);
 
-  // 類型轉換函數 - 將外部 API 數據轉換為本地類型
-  const convertToLocalCompetition = (data: Record<string, unknown>): LocalCompetition => ({
-    id: String(data.id || ''),
-    name: String(data.name || ''),
-    description: String(data.description || ''),
-    organizer: String(data.organizer || ''),
-    category: String(data.category || '技術創新'),
-    date: String(data.date || ''),
-    location: data.location ? String(data.location) : undefined,
-    result: String(data.result || '參賽'),
-    teamSize: data.teamSize ? Number(data.teamSize) : undefined,
-    role: data.role ? String(data.role) : undefined,
-    technologies: Array.isArray(data.technologies) ? data.technologies as string[] : [],
-    certificateUrl: data.certificateUrl ? String(data.certificateUrl) : undefined,
-    certificateFile: data.certificateFile as LocalCompetition['certificateFile'],
-    projectUrl: data.projectUrl ? String(data.projectUrl) : undefined,
-    featured: Boolean(data.featured !== false),
-    createdAt: String(data.createdAt || new Date().toISOString())
+  // 類型轉換函數 - 將任何外部數據轉換為本地類型
+  const convertToLocalCompetition = (data: unknown): LocalCompetition => {
+    const item = data as Record<string, unknown>;
+    return {
+      id: String(item.id || ''),
+      name: String(item.name || ''),
+      description: String(item.description || ''),
+      organizer: String(item.organizer || ''),
+      category: String(item.category || '技術創新'),
+      date: String(item.date || ''),
+      location: item.location ? String(item.location) : undefined,
+      result: String(item.result || '參賽'),
+      teamSize: item.teamSize ? Number(item.teamSize) : undefined,
+      role: item.role ? String(item.role) : undefined,
+      technologies: Array.isArray(item.technologies) ? item.technologies as string[] : [],
+      certificateUrl: item.certificateUrl ? String(item.certificateUrl) : undefined,
+      certificateFile: item.certificateFile as LocalCompetition['certificateFile'],
+      projectUrl: item.projectUrl ? String(item.projectUrl) : undefined,
+      featured: Boolean(item.featured !== false),
+      createdAt: String(item.createdAt || new Date().toISOString())
+    };
+  };
+
+  // 將本地類型轉換為 API 期望的格式
+  const convertToApiFormat = (local: LocalCompetition): unknown => ({
+    id: local.id,
+    name: local.name,
+    description: local.description,
+    organizer: local.organizer,
+    category: local.category,
+    date: local.date,
+    location: local.location,
+    result: local.result,
+    teamSize: local.teamSize,
+    role: local.role,
+    technologies: local.technologies,
+    certificateUrl: local.certificateUrl,
+    certificateFile: local.certificateFile,
+    projectUrl: local.projectUrl,
+    featured: local.featured,
+    createdAt: local.createdAt
   });
 
   const loadCompetitions = async () => {
@@ -127,9 +150,12 @@ export default function CompetitionsPage() {
         return;
       }
 
-      const success = editingCompetition.id 
-        ? await adminApi.updateCompetition(editingCompetition)
-        : await adminApi.createCompetition(editingCompetition);
+      // 轉換為 API 期望的格式
+      const apiData = convertToApiFormat(editingCompetition) as Record<string, unknown>;
+
+      const success = editingCompetition.id
+        ? await adminApi.updateCompetition(apiData)
+        : await adminApi.createCompetition(apiData);
 
       if (success) {
         await loadCompetitions();
