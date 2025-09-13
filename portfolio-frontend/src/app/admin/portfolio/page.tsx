@@ -7,6 +7,7 @@ import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
 import { UserInfo, Project, Skill } from '../../../types/admin';
 import { adminApi } from '../../../lib/adminApi';
+import AdminProtection from '../../../components/common/AdminProtection';
 
 export default function PortfolioPreviewPage() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -48,17 +49,19 @@ export default function PortfolioPreviewPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex items-center justify-center">
+      <AdminProtection>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">載入作品集中...</p>
         </div>
-      </div>
+      </AdminProtection>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <AdminProtection>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto">
         {/* 頁面標題 */}
         <motion.div
@@ -342,6 +345,6 @@ export default function PortfolioPreviewPage() {
           </Card>
         </motion.div>
       </div>
-    </div>
+    </AdminProtection>
   );
 }

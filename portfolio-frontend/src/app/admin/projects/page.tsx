@@ -5,6 +5,7 @@ import { logger } from '../../../lib/logger';
 import { motion } from 'framer-motion';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
+import AdminProtection from '../../../components/common/AdminProtection';
 import { Project } from '../../../types/admin';
 import { adminApi } from '../../../lib/adminApi';
 
@@ -122,7 +123,8 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <AdminProtection>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto">
         {/* 頁面標題 */}
         <motion.div
@@ -372,6 +374,7 @@ export default function ProjectsPage() {
           )}
         </motion.div>
       </div>
-    </div>
+      </div>
+    </AdminProtection>
   );
 }

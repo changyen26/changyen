@@ -7,6 +7,7 @@ import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
 import { MediaCoverage } from '../../../types/admin';
 import { adminApi } from '../../../lib/adminApi';
+import AdminProtection from '../../../components/common/AdminProtection';
 
 const MEDIA_CATEGORIES = [
   '媒體報導',
@@ -133,7 +134,8 @@ export default function MediaCoveragePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <AdminProtection>
+      <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* 標題區 */}
@@ -428,6 +430,6 @@ export default function MediaCoveragePage() {
           )}
         </Card>
       </div>
-    </div>
+    </AdminProtection>
   );
 }

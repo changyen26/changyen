@@ -6,12 +6,11 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
+import AdminProtection from '../../components/common/AdminProtection';
 import { UserInfo } from '../../types/admin';
 import { adminApi } from '../../lib/adminApi';
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
   const [userInfo, setUserInfo] = useState<UserInfo>({
     name: '',
     email: '',
@@ -24,25 +23,9 @@ export default function AdminPage() {
     location: '',
     website: ''
   });
-  
+
   const [editingInfo, setEditingInfo] = useState<UserInfo>({ ...userInfo });
   const [isEditing, setIsEditing] = useState(false);
-
-  // 身份驗證
-  const handleLogin = async () => {
-    try {
-      const isValid = await adminApi.validatePassword(password);
-      if (isValid) {
-        setIsAuthenticated(true);
-        localStorage.setItem('admin_authenticated', 'true');
-        await loadUserInfo();
-      } else {
-        alert('密碼錯誤！');
-      }
-    } catch {
-      alert('登入失敗，請重試！');
-    }
-  };
 
   // 加載用戶信息
   const loadUserInfo = async () => {
@@ -55,20 +38,10 @@ export default function AdminPage() {
     }
   };
 
-  // 檢查是否已登入
+  // 載入時獲取用戶信息
   useEffect(() => {
-    const isAuth = localStorage.getItem('admin_authenticated');
-    if (isAuth === 'true') {
-      setIsAuthenticated(true);
-      loadUserInfo();
-    }
+    loadUserInfo();
   }, []);
-
-  // 登出功能
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('admin_authenticated');
-  };
 
   // 保存用戶信息
   const handleSaveInfo = async () => {
@@ -92,58 +65,8 @@ export default function AdminPage() {
     setIsEditing(false);
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md p-8"
-        >
-          <Card className="p-8">
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">管理後台登入</h1>
-              <p className="text-gray-600">請輸入管理員密碼</p>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  密碼
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="請輸入密碼"
-                  onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                />
-              </div>
-              
-              <Button 
-                onClick={handleLogin}
-                className="w-full"
-              >
-                登入
-              </Button>
-              
-              <div className="text-center">
-                <Link 
-                  href="/"
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  返回首頁
-                </Link>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
+    <AdminProtection>
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto">
         {/* 頁面標題和操作 */}
@@ -191,12 +114,6 @@ export default function AdminPage() {
               onClick={() => window.open('/', '_blank')}
             >
               完整網站
-            </Button>
-            <Button 
-              variant="secondary"
-              onClick={handleLogout}
-            >
-              登出
             </Button>
           </div>
         </motion.div>
@@ -486,5 +403,6 @@ export default function AdminPage() {
         </motion.div>
       </div>
     </div>
+    </AdminProtection>
   );
 }

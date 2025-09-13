@@ -7,6 +7,7 @@ import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
 import { Patent } from '../../../types/admin';
 import { adminApi } from '../../../lib/adminApi';
+import AdminProtection from '../../../components/common/AdminProtection';
 
 const PATENT_CATEGORIES = [
   '發明專利',
@@ -172,7 +173,8 @@ export default function PatentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <AdminProtection>
+      <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* 標題區 */}
@@ -540,6 +542,17 @@ export default function PatentsPage() {
                       </td>
                       <td className="p-3 text-center">
                         <div className="flex justify-center space-x-2">
+                          {patent.patentUrl && (
+                            <a
+                              href={patent.patentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-green-600 hover:text-green-800 text-sm"
+                              title="查看原始專利文件"
+                            >
+                              查看文件
+                            </a>
+                          )}
                           <button
                             onClick={() => handleEdit(patent)}
                             className="text-blue-600 hover:text-blue-800 text-sm"
@@ -561,7 +574,8 @@ export default function PatentsPage() {
             </div>
           )}
         </Card>
+        </div>
       </div>
-    </div>
+    </AdminProtection>
   );
 }

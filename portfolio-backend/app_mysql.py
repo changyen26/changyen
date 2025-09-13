@@ -83,20 +83,47 @@ def create_app(config_name=None):
     
     # 初始化擴展
     db.init_app(app)
+
+    # 增強 CORS 安全配置
     CORS(app, resources={
         r"/api/*": {
             "origins": app.config['CORS_ORIGINS'],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "Cache-Control", "Pragma"]
+            "allow_headers": ["Content-Type", "Authorization", "Cache-Control", "Pragma"],
+            "supports_credentials": True,
+            "max_age": 86400  # 24小時預檢緩存
         },
         r"/auth/*": {
             "origins": app.config['CORS_ORIGINS'],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "Cache-Control", "Pragma"]
+            "methods": ["POST", "OPTIONS"],  # 僅允許必要方法
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True,
+            "max_age": 86400
+        },
+        r"/uploads/*": {
+            "origins": app.config['CORS_ORIGINS'],
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "max_age": 86400
         }
     })
     migrate = Migrate(app, db)
-    
+
+    # 安全設置 - 隱藏技術資訊
+    @app.after_request
+    def after_request(response):
+        # 移除服務器資訊標頭
+        response.headers.pop('Server', None)
+        response.headers.pop('X-Powered-By', None)
+
+        # 添加安全標頭
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+
+        return response
+
     # 確保上傳目錄存在
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])

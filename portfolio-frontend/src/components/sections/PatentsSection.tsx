@@ -188,13 +188,23 @@ export default function PatentsSection() {
                       {patent.category || '專利'}
                     </span>
                     
-                    <motion.button
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                      whileHover={{ x: 5 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      查看詳情 →
-                    </motion.button>
+                    <div className="flex flex-col gap-2">
+                      {patent.patentUrl ? (
+                        <a
+                          href={patent.patentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center gap-1 transition-all duration-200 hover:translate-x-1"
+                          title="點擊查看專利文件（若遇到系統錯誤請稍後再試）"
+                        >
+                          查看專利文件 →
+                        </a>
+                      ) : (
+                        <span className="text-gray-400 text-sm">
+                          暫無專利文件
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </Card>

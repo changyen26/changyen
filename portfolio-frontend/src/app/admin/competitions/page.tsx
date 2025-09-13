@@ -7,6 +7,7 @@ import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
 import FileUpload from '../../../components/common/FileUpload';
 import ImageUpload from '../../../components/common/ImageUpload';
+import AdminProtection from '../../../components/common/AdminProtection';
 import { adminApi } from '../../../lib/adminApi';
 
 // 本地競賽類型定義 - 避免 Zeabur 部署環境的模塊解析衝突
@@ -289,8 +290,9 @@ export default function CompetitionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto">
+    <AdminProtection>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="max-w-6xl mx-auto">
         {/* 頁面標題 */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -804,7 +806,8 @@ export default function CompetitionsPage() {
             </div>
           )}
         </motion.div>
+        </div>
       </div>
-    </div>
+    </AdminProtection>
   );
 }
