@@ -1,253 +1,252 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import type { Easing } from 'framer-motion';
 import { logger } from '../../lib/logger';
-import { Newspaper, Calendar, ExternalLink, Eye } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { formatDate } from '../../lib/utils';
 import { useInView } from '../../hooks/useInView';
-import Card from '../common/Card';
-import Button from '../common/Button';
 import { MediaCoverage } from '../../types/admin';
 import { adminApi } from '../../lib/adminApi';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function NewsSection() {
-  const [sectionRef, isInView] = useInView({ threshold: 0.2 });
-  const [selectedArticle, setSelectedArticle] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [sectionRef, isInView] = useInView({ threshold: 0.1 });
   const [news, setNews] = useState<MediaCoverage[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // 滑動控制 - 支援循環
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % news.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + news.length) % news.length);
+  };
+
+  // 計算滑動距離
+  const translateX = -currentIndex * 100;
+
+  // 觸控滑動支援
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+  };
 
   useEffect(() => {
     const loadNews = async () => {
       try {
-        // 從後端 API 獲取媒體報導數據
         const newsData = await adminApi.getMediaCoverage();
         logger.log('NewsSection loaded media coverage from API:', newsData);
-        
+
         if (newsData && newsData.length > 0) {
-          setNews(newsData);
+          // 按發布日期排序（最新在前）
+          const sortedNews = newsData.sort((a, b) => {
+            const dateA = new Date(a.publicationDate || '').getTime();
+            const dateB = new Date(b.publicationDate || '').getTime();
+            return dateB - dateA; // 降序排列
+          });
+          setNews(sortedNews);
         } else {
-          // 如果 API 沒有數據，使用空陣列
-          setNews([]);
+          // 使用預設數據作為示例
+          setNews([
+            {
+              id: '1',
+              title: '創新科技引領未來：AI 與物聯網的結合',
+              mediaName: 'TechCrunch',
+              publicationDate: '2024-01-15',
+              url: '#',
+              summary: '探討人工智能與物聯網技術的深度整合，以及其在智慧城市建設中的應用前景。這項技術突破將為未來城市發展帶來革命性改變。',
+              mediaType: '技術創新',
+              featured: true
+            },
+            {
+              id: '2',
+              title: '區塊鏈技術在供應鏈管理的創新應用',
+              mediaName: 'Forbes',
+              publicationDate: '2024-01-10',
+              url: '#',
+              summary: '深入分析區塊鏈技術如何改變傳統供應鏈管理模式，提升透明度和效率，為企業創造更大價值。',
+              mediaType: '技術創新',
+              featured: false
+            },
+            {
+              id: '3',
+              title: '下一代量子計算的突破性進展',
+              mediaName: 'MIT Review',
+              publicationDate: '2024-01-05',
+              url: '#',
+              summary: '報導最新量子計算研究成果，展示其在密碼學、藥物研發等領域的潛在應用價值。',
+              mediaType: '技術創新',
+              featured: false
+            }
+          ]);
         }
       } catch (error) {
         logger.error('Failed to load media coverage from API:', error);
-        // API 失敗時使用空陣列
         setNews([]);
       }
     };
 
     loadNews();
-
-    // 定期重新載入數據
-    const interval = setInterval(loadNews, 30000); // 30秒重新載入一次
-    
-    return () => clearInterval(interval);
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 50, rotateX: -10 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      rotateX: 0
-    }
-  };
-
   return (
-    <section 
-      id="news" 
-      ref={sectionRef}
-      className="py-20 bg-gradient-to-b from-white to-blue-50 relative overflow-hidden"
+    <section
+      id="news"
+      ref={containerRef}
+      className="relative bg-white min-h-screen"
     >
-      {/* 背景裝飾 */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-20 w-32 h-32 border border-blue-400 rounded-full animate-spin" style={{ animationDuration: '20s' }} />
-        <div className="absolute bottom-40 right-10 w-24 h-24 border border-purple-400 rounded-full animate-spin" style={{ animationDuration: '15s', animationDirection: 'reverse' }} />
-      </div>
+      <div
+        ref={sectionRef}
+        className="h-screen overflow-hidden"
+      >
+        <div className="h-full flex flex-col">
+          {/* 固定標題區 */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ duration: 1.2, ease: 'easeOut' as Easing }}
+            className="pt-32 pl-8 md:pl-16 pb-8 flex-shrink-0"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-[1px] bg-black/20" />
+              <span className="text-sm tracking-[0.3em] uppercase text-black/60 font-mono">
+                MEDIA COVERAGE
+              </span>
+            </div>
+            <div className="flex items-center justify-between pr-8 md:pr-16">
+              <h2 className="text-5xl md:text-7xl font-bold uppercase tracking-tight text-black font-mono">
+                NEWS
+              </h2>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: 'easeOut' as Easing }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            媒體報導
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            技術創新獲得媒體關注，專業實力受到業界認可
-          </p>
-        </motion.div>
-
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="grid gap-8 lg:grid-cols-3"
-        >
-          {news.map((article) => (
-            <motion.div
-              key={article.id}
-              variants={itemVariants}
-              className="group"
-            >
-              <Card className="overflow-hidden h-full hover:shadow-2xl">
-                {/* 文章圖片 */}
-                <div className="relative overflow-hidden">
-                  <motion.div
-                    className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.3 }}
+              {/* 導航按鈕 */}
+              {news.length > 1 && (
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={prevSlide}
+                    className="p-3 rounded-full border border-black/20 hover:border-black/40 transition-all duration-300"
                   >
-                    <Newspaper size={48} className="text-white" />
-                  </motion.div>
-                  
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-700">
-                    {article.mediaName}
-                  </div>
+                    <ChevronLeft size={24} />
+                  </button>
+                  <span className="font-mono text-sm text-black/60">
+                    {String(currentIndex + 1).padStart(2, '0')} / {String(news.length).padStart(2, '0')}
+                  </span>
+                  <button
+                    onClick={nextSlide}
+                    className="p-3 rounded-full border border-black/20 hover:border-black/40 transition-all duration-300"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
                 </div>
+              )}
+            </div>
+          </motion.div>
 
-                <div className="p-6">
-                  <div className="flex items-center text-sm text-gray-500 mb-3">
-                    <Calendar size={16} className="mr-2" />
-                    <span>{formatDate(article.publicationDate)}</span>
-                  </div>
-
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
-                    {article.title}
-                  </h3>
-
-                  <p className="text-gray-600 mb-6 line-clamp-3 leading-relaxed">
-                    {article.summary}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedArticle(selectedArticle === article.id ? null : article.id)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Eye size={16} className="mr-2" />
-                      {selectedArticle === article.id ? '收起' : '預覽'}
-                    </Button>
-
-                    <motion.a
-                      href={article.articleUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200"
-                      whileHover={{ x: 5 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      閱讀全文
-                      <ExternalLink size={16} className="ml-2" />
-                    </motion.a>
-                  </div>
-
-                  {/* 展開的預覽內容 */}
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      height: selectedArticle === article.id ? 'auto' : 0,
-                      opacity: selectedArticle === article.id ? 1 : 0
+          {/* 滑動容器 */}
+          <div
+            className="flex-1 flex items-center overflow-hidden pl-8 md:pl-16"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
+            <div className="relative w-full flex justify-center">
+              {/* 只顯示當前索引的新聞 */}
+              {news.length > 0 && (
+                <motion.div
+                  key={`news-${currentIndex}`}
+                  className="flex justify-center items-center"
+                  initial={{ opacity: 0, x: 100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -100 }}
+                  transition={{
+                    duration: 0.6,
+                    ease: [0.19, 1, 0.22, 1] as Easing
+                  }}
+                >
+                  <div
+                    className="border border-black/10 rounded-3xl p-8 md:p-12 flex flex-col justify-between bg-white hover:border-black/30 transition-colors duration-300 group cursor-pointer"
+                    style={{
+                      height: 'clamp(30rem, 60vh, 40rem)',
+                      width: 'clamp(20rem, 70vw, 28rem)'
                     }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' as Easing }}
-                    className="overflow-hidden"
                   >
-                    <div className="pt-4 mt-4 border-t border-gray-200">
-                      <p className="text-gray-700 leading-relaxed">
-                        {article.summary}
-                      </p>
-                      
-                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center justify-between text-sm text-gray-600">
-                          <span>媒體來源：{article.mediaName}</span>
-                          <span>發佈日期：{formatDate(article.publicationDate)}</span>
-                        </div>
+                    {/* 頂部：編號和標題 */}
+                    <div>
+                      <span className="text-sm font-mono text-black/40">
+                        ({String(currentIndex + 1).padStart(2, '0')})
+                      </span>
+                      <h3 className="text-2xl md:text-3xl font-bold uppercase mt-4 leading-tight text-black font-mono">
+                        {news[currentIndex].title.length > 30
+                          ? news[currentIndex].title.substring(0, 30) + '...'
+                          : news[currentIndex].title}
+                      </h3>
+                      <div className="mt-4 flex items-center gap-4">
+                        <span className="text-sm font-mono text-black/60">
+                          {news[currentIndex].mediaName}
+                        </span>
+                        <span className="text-sm font-mono text-black/40">
+                          {formatDate(news[currentIndex].publicationDate)}
+                        </span>
                       </div>
                     </div>
-                  </motion.div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
 
-        {/* 媒體統計 */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="mt-16 text-center"
-        >
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">媒體曝光統計</h3>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div>
-                <motion.div
-                  className="text-3xl font-bold text-blue-600 mb-2"
-                  initial={{ scale: 0 }}
-                  animate={isInView ? { scale: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 1 }}
-                >
-                  {news.length}
+                    {/* 中部：摘要 */}
+                    <p className="text-base leading-relaxed text-black/70 font-mono py-6">
+                      {news[currentIndex].summary}
+                    </p>
+
+                    {/* 底部：連結 */}
+                    <motion.a
+                      href={news[currentIndex].url || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-wider text-black/60 hover:text-black transition-colors duration-300"
+                      whileHover={{ x: 5 }}
+                    >
+                      Read Article
+                      <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </motion.a>
+                  </div>
                 </motion.div>
-                <div className="text-gray-600">報導總數</div>
-              </div>
-              
-              <div>
-                <motion.div
-                  className="text-3xl font-bold text-green-600 mb-2"
-                  initial={{ scale: 0 }}
-                  animate={isInView ? { scale: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 1.1 }}
-                >
-                  {new Set(news.map(n => n.mediaName)).size}
-                </motion.div>
-                <div className="text-gray-600">媒體機構</div>
-              </div>
-              
-              <div>
-                <motion.div
-                  className="text-3xl font-bold text-purple-600 mb-2"
-                  initial={{ scale: 0 }}
-                  animate={isInView ? { scale: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 1.2 }}
-                >
-                  2024
-                </motion.div>
-                <div className="text-gray-600">最新年份</div>
-              </div>
-              
-              <div>
-                <motion.div
-                  className="text-3xl font-bold text-orange-600 mb-2"
-                  initial={{ scale: 0 }}
-                  animate={isInView ? { scale: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 1.3 }}
-                >
-                  100K+
-                </motion.div>
-                <div className="text-gray-600">預估觸及</div>
-              </div>
+              )}
+
+              {/* 如果沒有報導 */}
+              {news.length === 0 && (
+                <div className="flex justify-center items-center h-96">
+                  <p className="font-mono text-black/40 text-sm uppercase tracking-wider">
+                    No media coverage available
+                  </p>
+                </div>
+              )}
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

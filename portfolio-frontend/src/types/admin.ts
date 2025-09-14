@@ -108,14 +108,18 @@ export interface MediaCoverage {
   id: string;
   title: string;
   mediaName: string; // 媒體名稱
-  summary?: string; // 報導摘要
-  articleUrl?: string; // 報導連結
-  imageUrl?: string; // 報導圖片
-  category: string; // 報導類別：新聞報導、專訪、評論等
-  status: string; // 狀態：已發布、草稿、已刪除
+  mediaType?: string; // 報導類型：新聞、專訪、報導等
   publicationDate?: string; // 發布日期
+  author?: string; // 作者/記者
+  summary?: string; // 報導摘要
+  content?: string; // 完整內容
+  url?: string; // 原文連結
+  imageUrl?: string; // 封面圖片
   featured: boolean; // 是否為精選報導
+  viewCount?: number; // 瀏覽次數
+  tags?: string[]; // 標籤
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface FileData {

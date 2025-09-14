@@ -580,12 +580,14 @@ class AdminApiService {
           title: mediaCoverage.title || '',
           mediaName: mediaCoverage.mediaName || '',
           summary: mediaCoverage.summary,
-          articleUrl: mediaCoverage.articleUrl,
+          url: mediaCoverage.url,
           imageUrl: mediaCoverage.imageUrl,
-          category: mediaCoverage.category || '媒體報導',
-          status: mediaCoverage.status || '已發布',
+          mediaType: mediaCoverage.mediaType || '媒體報導',
+          author: mediaCoverage.author,
+          content: mediaCoverage.content,
           publicationDate: mediaCoverage.publicationDate,
           featured: mediaCoverage.featured || false,
+          tags: mediaCoverage.tags || [],
           createdAt: new Date().toISOString(),
         };
 

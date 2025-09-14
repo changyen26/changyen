@@ -18,12 +18,6 @@ const MEDIA_CATEGORIES = [
   '其他'
 ];
 
-const MEDIA_STATUS = [
-  '已發布',
-  '草稿',
-  '審核中',
-  '已下架'
-];
 
 export default function MediaCoveragePage() {
   const [mediaList, setMediaList] = useState<MediaCoverage[]>([]);
@@ -32,13 +26,15 @@ export default function MediaCoveragePage() {
     id: '',
     title: '',
     mediaName: '',
-    summary: '',
-    articleUrl: '',
-    imageUrl: '',
-    category: '媒體報導',
-    status: '已發布',
+    mediaType: '媒體報導',
     publicationDate: '',
-    featured: false
+    author: '',
+    summary: '',
+    content: '',
+    url: '',
+    imageUrl: '',
+    featured: false,
+    tags: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -114,13 +110,15 @@ export default function MediaCoveragePage() {
       id: '',
       title: '',
       mediaName: '',
-      summary: '',
-      articleUrl: '',
-      imageUrl: '',
-      category: '媒體報導',
-      status: '已發布',
+      mediaType: '媒體報導',
       publicationDate: '',
-      featured: false
+      author: '',
+      summary: '',
+      content: '',
+      url: '',
+      imageUrl: '',
+      featured: false,
+      tags: []
     });
   };
 
@@ -203,11 +201,11 @@ export default function MediaCoveragePage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      報導類別
+                      報導類型
                     </label>
                     <select
-                      value={editingMedia.category}
-                      onChange={(e) => setEditingMedia({...editingMedia, category: e.target.value})}
+                      value={editingMedia.mediaType}
+                      onChange={(e) => setEditingMedia({...editingMedia, mediaType: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       {MEDIA_CATEGORIES.map(category => (
@@ -218,17 +216,15 @@ export default function MediaCoveragePage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      發布狀態
+                      作者/記者
                     </label>
-                    <select
-                      value={editingMedia.status}
-                      onChange={(e) => setEditingMedia({...editingMedia, status: e.target.value})}
+                    <input
+                      type="text"
+                      value={editingMedia.author || ''}
+                      onChange={(e) => setEditingMedia({...editingMedia, author: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {MEDIA_STATUS.map(status => (
-                        <option key={status} value={status}>{status}</option>
-                      ))}
-                    </select>
+                      placeholder="記者或作者姓名"
+                    />
                   </div>
 
                   <div>
@@ -249,8 +245,8 @@ export default function MediaCoveragePage() {
                     </label>
                     <input
                       type="url"
-                      value={editingMedia.articleUrl || ''}
-                      onChange={(e) => setEditingMedia({...editingMedia, articleUrl: e.target.value})}
+                      value={editingMedia.url || ''}
+                      onChange={(e) => setEditingMedia({...editingMedia, url: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="https://"
                     />
@@ -348,8 +344,8 @@ export default function MediaCoveragePage() {
                   <tr className="border-b bg-gray-50">
                     <th className="text-left p-3">報導標題</th>
                     <th className="text-left p-3">媒體名稱</th>
-                    <th className="text-left p-3">類別</th>
-                    <th className="text-left p-3">狀態</th>
+                    <th className="text-left p-3">類型</th>
+                    <th className="text-left p-3">作者</th>
                     <th className="text-left p-3">發布日期</th>
                     <th className="text-left p-3">精選</th>
                     <th className="text-center p-3">操作</th>
@@ -375,17 +371,12 @@ export default function MediaCoveragePage() {
                       </td>
                       <td className="p-3">
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                          {media.category}
+                          {media.mediaType}
                         </span>
                       </td>
                       <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-sm ${
-                          media.status === '已發布' ? 'bg-green-100 text-green-800' :
-                          media.status === '草稿' ? 'bg-yellow-100 text-yellow-800' :
-                          media.status === '審核中' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {media.status}
+                        <span className="text-sm">
+                          {media.author || '-'}
                         </span>
                       </td>
                       <td className="p-3">
@@ -404,9 +395,9 @@ export default function MediaCoveragePage() {
                           >
                             編輯
                           </button>
-                          {media.articleUrl && (
+                          {media.url && (
                             <a
-                              href={media.articleUrl}
+                              href={media.url}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-green-600 hover:text-green-800 text-sm"

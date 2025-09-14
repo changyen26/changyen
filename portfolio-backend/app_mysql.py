@@ -752,15 +752,16 @@ def register_routes(app):
             # 創建新媒體報導
             media = MediaCoverage()
             media.id = str(uuid.uuid4())
-            media.user_id = 1  # 默認用戶ID
             media.title = data.get('title', '')
             media.media_name = data.get('mediaName', '')
             media.summary = data.get('summary', '')
-            media.article_url = data.get('articleUrl', '')
+            media.url = data.get('url', '')  # 修正為 url
             media.image_url = data.get('imageUrl', '')
-            media.category = data.get('category', '媒體報導')
+            media.media_type = data.get('mediaType', '新聞報導')
+            media.author = data.get('author', '')
             media.featured = data.get('featured', False)
-            media.status = data.get('status', '已發布')
+            media.content = data.get('content', '')
+            media.tags = data.get('tags', [])
             
             # 處理發布日期
             if data.get('publicationDate'):
@@ -795,16 +796,20 @@ def register_routes(app):
                 media.media_name = data['mediaName']
             if 'summary' in data:
                 media.summary = data['summary']
-            if 'articleUrl' in data:
-                media.article_url = data['articleUrl']
+            if 'url' in data:
+                media.url = data['url']  # 修正為 url
             if 'imageUrl' in data:
                 media.image_url = data['imageUrl']
-            if 'category' in data:
-                media.category = data['category']
+            if 'mediaType' in data:
+                media.media_type = data['mediaType']
+            if 'author' in data:
+                media.author = data['author']
             if 'featured' in data:
                 media.featured = data['featured']
-            if 'status' in data:
-                media.status = data['status']
+            if 'content' in data:
+                media.content = data['content']
+            if 'tags' in data:
+                media.tags = data['tags']
             
             # 處理發布日期
             if 'publicationDate' in data:
