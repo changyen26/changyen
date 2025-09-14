@@ -10,11 +10,11 @@ import { logger } from '../../lib/logger';
 import Button from './Button';
 
 const navItems = [
-  { label: '首頁', href: '#home' },
-  { label: '專利', href: '#patents' },
-  { label: '競賽', href: '#competitions' },
-  { label: '新聞', href: '#news' },
-  { label: '關於', href: '#about' },
+  { label: 'HOME', href: '#home' },
+  { label: 'PATENTS', href: '#patents' },
+  { label: 'COMPETITIONS', href: '#competitions' },
+  { label: 'NEWS', href: '#news' },
+  { label: 'ABOUT', href: '#about' },
 ];
 
 export default function Navigation() {
@@ -22,10 +22,26 @@ export default function Navigation() {
   const [userName, setUserName] = useState('謝長諺'); // 預設值
   const { scrollY, scrollDirection } = useScroll();
   const [activeSection, setActiveSection] = useState('home');
+  const [currentTime, setCurrentTime] = useState('');
 
   const isVisible = scrollY < 100 || scrollDirection === 'up';
 
   useEffect(() => {
+    // 更新時間
+    const updateTime = () => {
+      const now = new Date();
+      const taiwanTime = now.toLocaleString('en-US', {
+        timeZone: 'Asia/Taipei',
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      setCurrentTime(`TAIWAN, TW ${taiwanTime} CST`);
+    };
+
+    updateTime();
+    const timeInterval = setInterval(updateTime, 60000); // 每分鐘更新
+
     // 延遲載入用戶資料，避免阻塞初始渲染
     const timer = setTimeout(() => {
       const loadUserData = async () => {
@@ -62,6 +78,7 @@ export default function Navigation() {
     return () => {
       window.removeEventListener('scroll', handleSectionChange);
       clearTimeout(timer);
+      clearInterval(timeInterval);
     };
   }, []);
 
@@ -78,22 +95,38 @@ export default function Navigation() {
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        scrollY > 50 
-          ? 'backdrop-blur-md bg-white/80 border-b border-gray-200/20' 
+        scrollY > 50
+          ? 'bg-white border-b border-gray-200'
           : 'bg-transparent'
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+          {/* Logo */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
             className="flex-shrink-0"
           >
-            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              {userName}
+            <h1 className="text-sm font-mono uppercase tracking-widest text-black">
+              {userName}.PORTFOLIO
             </h1>
+          </motion.div>
+
+          {/* Role - 隱藏在滾動時 */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{
+              opacity: scrollY < 50 ? 1 : 0,
+              y: scrollY < 50 ? 0 : -20
+            }}
+            transition={{ duration: 0.3 }}
+            className="hidden md:block flex-1 text-center"
+          >
+            <p className="text-xs font-mono uppercase tracking-widest text-gray-600">
+              INNOVATION ENGINEER — AI / TECH
+            </p>
           </motion.div>
 
           {/* Desktop Navigation */}
@@ -107,10 +140,10 @@ export default function Navigation() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   onClick={() => scrollToSection(item.href)}
                   className={cn(
-                    'px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 relative',
+                    'px-4 py-2 text-xs font-mono uppercase tracking-widest transition-all duration-200 relative border-b border-transparent',
                     activeSection === item.href.substring(1)
-                      ? 'text-black'
-                      : 'text-gray-600 hover:text-black'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 hover:text-black hover:border-gray-300'
                   )}
                 >
                   {item.label}
@@ -126,6 +159,21 @@ export default function Navigation() {
               ))}
             </div>
           </div>
+
+          {/* Location & Time - 隱藏在滾動時 */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{
+              opacity: scrollY < 50 ? 1 : 0,
+              x: scrollY < 50 ? 0 : 20
+            }}
+            transition={{ duration: 0.3 }}
+            className="hidden lg:block"
+          >
+            <p className="text-xs font-mono uppercase tracking-widest text-gray-600">
+              {currentTime}
+            </p>
+          </motion.div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">

@@ -1,6 +1,10 @@
-import { lazy, Suspense } from 'react';
+'use client';
+
+import { lazy, Suspense, useState } from 'react';
 import Navigation from '../components/common/Navigation';
 import HeroSection from '../components/sections/HeroSection';
+import Preloader from '../components/animations/Preloader';
+import CustomCursor from '../components/animations/CustomCursor';
 
 // 懶加載非關鍵組件
 const AboutSection = lazy(() => import('../components/sections/AboutSection'));
@@ -11,29 +15,44 @@ const NewsSection = lazy(() => import('../components/sections/NewsSection'));
 // 簡單的載入組件
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-20">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600"></div>
   </div>
 );
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handlePreloaderComplete = () => {
+    setIsLoading(false);
+  };
+
   return (
-    <div className="min-h-screen">
-      <Navigation />
-      <main>
-        <HeroSection />
-        <Suspense fallback={<SectionLoader />}>
-          <AboutSection />
-        </Suspense>
-        <Suspense fallback={<SectionLoader />}>
-          <PatentsSection />
-        </Suspense>
-        <Suspense fallback={<SectionLoader />}>
-          <CompetitionsSection />
-        </Suspense>
-        <Suspense fallback={<SectionLoader />}>
-          <NewsSection />
-        </Suspense>
-      </main>
-    </div>
+    <>
+      {/* 自定義游標 */}
+      <CustomCursor />
+
+      {/* 預載入動畫 */}
+      {isLoading && <Preloader onComplete={handlePreloaderComplete} />}
+
+      {/* 主要內容 */}
+      <div className="min-h-screen">
+        <Navigation />
+        <main>
+          <HeroSection />
+          <Suspense fallback={<SectionLoader />}>
+            <AboutSection />
+          </Suspense>
+          <Suspense fallback={<SectionLoader />}>
+            <PatentsSection />
+          </Suspense>
+          <Suspense fallback={<SectionLoader />}>
+            <CompetitionsSection />
+          </Suspense>
+          <Suspense fallback={<SectionLoader />}>
+            <NewsSection />
+          </Suspense>
+        </main>
+      </div>
+    </>
   );
 }

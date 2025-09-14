@@ -5,16 +5,18 @@ import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { gsap } from 'gsap';
 import { UserInfo } from '../../types/admin';
+import { useScroll } from '../../hooks/useScroll';
 import { adminApi } from '../../lib/adminApi';
 import { logger } from '../../lib/logger';
 import Button from '../common/Button';
-import TypewriterText from '../animations/TypewriterText';
-import MagneticButton from '../animations/MagneticButton';
+import TextReveal from '../animations/TextReveal';
+import AnimatedLink from '../animations/AnimatedLink';
 
 export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const { scrollY } = useScroll();
   const [userInfo, setUserInfo] = useState<UserInfo>({
     name: "謝長諺",
     email: "changyen26@gmail.com",
@@ -90,120 +92,82 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section 
-      id="home" 
+    <section
+      id="home"
       ref={heroRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100"
-      style={{
-        backgroundImage: `
-          radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)
-        `,
-        backgroundSize: '400% 400%'
-      }}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-50 text-black"
     >
-      {/* 浮動的幾何形狀 */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(6)].map((_, i) => {
-          // 使用索引作為種子來生成一致的"隨機"值
-          const seed = i * 137.5; // 使用黃金角度作為基礎
-          const width = ((seed * 47) % 200) + 100; // 100-300px
-          const height = ((seed * 53) % 200) + 100; // 100-300px
-          const left = (seed * 17) % 100; // 0-100%
-          const top = (seed * 23) % 100; // 0-100%
-          const x = ((seed * 31) % 100) - 50; // -50 to 50
-          const y = ((seed * 41) % 100) - 50; // -50 to 50
-          const duration = ((seed * 7) % 10) + 10; // 10-20s
-
-          return (
-            <motion.div
-              key={i}
-              className="absolute bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full"
-              style={{
-                width: `${width}px`,
-                height: `${height}px`,
-                left: `${left}%`,
-                top: `${top}%`,
-              }}
-              animate={{
-                x: [0, x],
-                y: [0, y],
-                rotate: [0, 360],
-              }}
-              transition={{
-                duration: duration,
-                repeat: Infinity,
-                repeatType: 'reverse',
-                ease: 'linear'
-              }}
-            />
-          );
-        })}
+      {/* 極簡網格背景 */}
+      <div className="absolute inset-0 opacity-[0.02]">
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}
+        />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="mb-8"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: 'easeOut' }}
+          className="mb-16"
         >
-          <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center text-4xl font-bold text-white shadow-2xl">
-            {userInfo.name.charAt(0)}
-          </div>
+          <div className="w-2 h-2 mx-auto mb-8 bg-black rounded-full" />
         </motion.div>
 
-        <h1 className="text-6xl md:text-8xl font-bold text-gray-900 mb-6 leading-tight">
-          <TypewriterText 
-            text={userInfo.name}
-            delay={500}
-            speed={100}
-            showCursor={false}
-          />
-        </h1>
+        <TextReveal
+          className="text-5xl md:text-7xl font-bold text-black mb-8 leading-tight tracking-wider uppercase font-mono"
+          delay={0.3}
+          duration={1}
+        >
+          {userInfo.name}
+        </TextReveal>
 
-        <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-          <TypewriterText 
-            text={userInfo.title}
-            delay={2000}
-            speed={50}
-            showCursor={false}
-          />
-        </p>
+        <TextReveal
+          className="text-lg md:text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed uppercase tracking-widest font-mono"
+          delay={0.6}
+          duration={1}
+        >
+          {userInfo.title || "INNOVATION THROUGH TECHNOLOGY"}
+        </TextReveal>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="text-lg text-gray-500 mb-12 max-w-3xl mx-auto"
+          transition={{ duration: 1, delay: 0.9 }}
+          className="text-sm text-gray-500 mb-16 max-w-xl mx-auto uppercase tracking-widest font-mono leading-loose"
         >
-          {userInfo.description}
+          {userInfo.description || "DEDICATED TO CREATING INNOVATIVE DIGITAL EXPERIENCES"}
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.2 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+          className="flex justify-center items-center mb-20"
         >
-          <MagneticButton strength={0.3}>
-            <Button 
-              size="lg" 
-              className="group"
-              onClick={() => document.getElementById('patents')?.scrollIntoView({ behavior: 'smooth' })}
+          <AnimatedLink
+            onClick={() => document.getElementById('patents')?.scrollIntoView({ behavior: 'smooth' })}
+            className="border border-black/20 px-8 py-3 text-sm uppercase tracking-widest font-mono text-black hover:bg-black hover:text-white transition-colors duration-500"
+            underlineColor="bg-black"
+          >
+            VIEW WORK
+            <motion.span
+              className="ml-3 inline-block"
+              animate={{ x: [0, 5, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
             >
-              查看我的作品
-              <motion.div
-                className="ml-2"
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                →
-              </motion.div>
-            </Button>
-          </MagneticButton>
-
+              →
+            </motion.span>
+          </AnimatedLink>
         </motion.div>
+
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -214,13 +178,41 @@ export default function HeroSection() {
           <motion.button
             onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
             animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-200"
+            transition={{ duration: 3, repeat: Infinity }}
+            className="p-3 border border-black/20 text-black hover:bg-black hover:text-white transition-all duration-300"
           >
-            <ChevronDown size={24} className="text-gray-600" />
+            <ChevronDown size={16} />
           </motion.button>
         </motion.div>
       </div>
+
+      {/* 專業領域超大背景標籤 - 頁面底部 */}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.5, delay: 2.5 }}
+        className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-7xl"
+        style={{
+          transform: `translate(-50%, 0) scale(${Math.max(0.7, Math.min(1.3, 0.7 + scrollY / 400))})`,
+          opacity: Math.max(0, Math.min(0.08, 0.08 - scrollY / 1500))
+        }}
+      >
+        <div className="text-center overflow-hidden w-full">
+          <motion.h2
+            className="font-bold font-mono uppercase text-black/8 leading-none select-none pointer-events-none whitespace-nowrap"
+            style={{
+              fontSize: `clamp(1rem, 4.5vw, 6rem)`,
+              letterSpacing: scrollY > 200 ? '0.2em' : '0.1em'
+            }}
+            animate={{
+              letterSpacing: scrollY > 200 ? '0.2em' : '0.1em'
+            }}
+            transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
+          >
+            物聯網｜壓電薄膜｜半導體｜全端
+          </motion.h2>
+        </div>
+      </motion.div>
     </section>
   );
 }

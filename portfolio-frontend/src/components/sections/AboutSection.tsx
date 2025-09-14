@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Code, Lightbulb, Users, Target, Mail } from 'lucide-react';
 import { useInView } from '../../hooks/useInView';
+import { useScroll } from '../../hooks/useScroll';
 import Card from '../common/Card';
 import Button from '../common/Button';
+import TextReveal from '../animations/TextReveal';
 import { Skill, UserInfo } from '../../types/admin';
 import { adminApi } from '../../lib/adminApi';
 import { logger } from '../../lib/logger';
@@ -47,6 +49,8 @@ const values = [
 
 export default function AboutSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.2 });
+  const [skillsRef, isSkillsInView] = useInView({ threshold: 0.1 });
+  const { scrollY } = useScroll();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo>({
     name: "謝長諺",
@@ -125,8 +129,8 @@ export default function AboutSection() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
+        staggerChildren: 0.4,
+        delayChildren: 0.6
       }
     }
   };
@@ -135,36 +139,67 @@ export default function AboutSection() {
     hidden: { opacity: 0, y: 50 },
     visible: {
       opacity: 1,
-      y: 0
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
     }
   };
 
   return (
-    <section 
-      id="about" 
+    <section
+      id="about"
       ref={sectionRef}
-      className="py-20 bg-gradient-to-b from-blue-50 to-white relative overflow-hidden"
+      className="py-20 bg-white text-black relative overflow-hidden"
     >
-      {/* 背景裝飾 */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
+      {/* 極簡分隔線 */}
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-px h-20 bg-gray-200" />
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            關於我
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            一位充滿熱情的技術創新者，致力於用科技改變世界
-          </p>
-        </motion.div>
+        <div className="text-center mb-20 relative">
+          {/* 大標題 - 滾動時從小變大 */}
+          <motion.div
+            className="relative overflow-hidden"
+            animate={{
+              scale: Math.max(0.5, Math.min(1.5, 0.5 + scrollY / 500)),
+              opacity: Math.max(0.1, Math.min(0.4, 0.1 + scrollY / 1000))
+            }}
+            transition={{ type: "spring", stiffness: 100, damping: 20 }}
+          >
+            <TextReveal
+              className="text-8xl md:text-9xl font-bold text-black/10 uppercase tracking-widest font-mono select-none pointer-events-none"
+              delay={0.1}
+              duration={1}
+            >
+              ABOUT
+            </TextReveal>
+          </motion.div>
+
+          {/* 小標題 */}
+          <motion.div
+            className="relative -mt-16 z-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: isInView ? 1 : 0, y: isInView ? 0 : 20 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            <TextReveal
+              className="text-2xl md:text-3xl font-bold text-black mb-8 uppercase tracking-widest font-mono"
+              delay={0.2}
+              duration={0.8}
+            >
+              ABOUT
+            </TextReveal>
+            <TextReveal
+              className="text-sm text-gray-500 max-w-2xl mx-auto uppercase tracking-wider font-mono leading-loose"
+              delay={0.4}
+              duration={0.8}
+            >
+              PASSIONATE TECHNOLOGY INNOVATOR DEDICATED TO CHANGING THE WORLD THROUGH TECHNOLOGY
+            </TextReveal>
+          </motion.div>
+        </div>
 
         {/* 個人介紹 */}
         <motion.div
@@ -223,47 +258,37 @@ export default function AboutSection() {
 
         {/* 技能展示 */}
         <motion.div
+          ref={skillsRef}
           variants={containerVariants}
           initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          animate={isSkillsInView ? "visible" : "hidden"}
           className="mb-20"
         >
-          <motion.h3
-            variants={itemVariants}
-            className="text-3xl font-bold text-center text-gray-900 mb-12"
+          <TextReveal
+            className="text-2xl font-bold text-center text-black mb-16 uppercase tracking-widest font-mono"
+            delay={0.2}
+            duration={0.8}
           >
-            技能專長
-          </motion.h3>
+            SKILLS
+          </TextReveal>
           
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
             {skills.map((skill, index) => (
               <motion.div
                 key={skill.id}
                 variants={itemVariants}
-                className="space-y-2"
+                className="space-y-4 group"
               >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-2">
-                    {skill.icon && (
-                      <img 
-                        src={skill.icon} 
-                        alt={skill.name}
-                        className="w-5 h-5"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    )}
-                    <span className="font-medium text-gray-900">{skill.name}</span>
-                  </div>
-                  <span className="text-sm font-semibold text-gray-600">{skill.level}%</span>
+                <div className="flex justify-between items-center border-b border-gray-200 pb-2">
+                  <span className="font-mono text-sm uppercase tracking-wider text-black">{skill.name}</span>
+                  <span className="font-mono text-xs text-gray-500">{skill.level}%</span>
                 </div>
-                <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-px bg-gray-100 overflow-hidden">
                   <motion.div
-                    className={`h-full bg-gradient-to-r ${categoryColors[skill.category] || categoryColors['Other']} rounded-full`}
+                    className="h-full bg-black"
                     initial={{ width: 0 }}
-                    animate={isInView ? { width: `${skill.level}%` } : { width: 0 }}
-                    transition={{ duration: 1.5, delay: index * 0.1, ease: "easeOut" }}
+                    animate={isSkillsInView ? { width: `${skill.level}%` } : { width: 0 }}
+                    transition={{ duration: 2.5, delay: index * 0.3, ease: "easeOut" }}
                   />
                 </div>
               </motion.div>
