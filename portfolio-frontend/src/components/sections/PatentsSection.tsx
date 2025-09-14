@@ -2,227 +2,216 @@
 
 import { motion } from 'framer-motion';
 import { logger } from '../../lib/logger';
-import { Calendar, Award, FileText, Filter } from 'lucide-react';
+import { Calendar, Award, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatDate } from '../../lib/utils';
 import { useInView } from '../../hooks/useInView';
-import Card from '../common/Card';
 import { Patent } from '../../types/admin';
 import { adminApi } from '../../lib/adminApi';
 
-const categories = ['全部', '發明專利', '新型專利', '設計專利'];
-
 export default function PatentsSection() {
-  const [sectionRef, isInView] = useInView({ threshold: 0.2 });
-  const [selectedCategory, setSelectedCategory] = useState('全部');
+  const [sectionRef, isInView] = useInView({ threshold: 0.1 });
   const [patents, setPatents] = useState<Patent[]>([]);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPatents = async () => {
       try {
-        // 從後端 API 獲取專利數據
         const patentsData = await adminApi.getPatents();
         logger.log('PatentsSection loaded patents from API:', patentsData);
-        
+
         if (patentsData && patentsData.length > 0) {
           setPatents(patentsData);
         } else {
-          // 如果 API 沒有數據，使用空陣列
           setPatents([]);
         }
       } catch (error) {
         logger.error('Failed to load patents from API:', error);
-        // API 失敗時使用空陣列
         setPatents([]);
       }
     };
 
     loadPatents();
 
-    // 定期重新載入數據
-    const interval = setInterval(loadPatents, 30000); // 30秒重新載入一次
-    
+    const interval = setInterval(loadPatents, 30000);
+
     return () => clearInterval(interval);
   }, []);
 
-  const filteredPatents = selectedCategory === '全部' 
-    ? (patents || [])
-    : (patents || []).filter(patent => patent.category === selectedCategory);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 50, rotateX: -15 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      rotateX: 0
-    }
-  };
-
   return (
-    <section 
-      id="patents" 
+    <section
+      id="patents"
       ref={sectionRef}
-      className="py-20 bg-gradient-to-b from-white to-gray-50"
+      className="py-32 bg-white"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-8">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="text-center mb-16"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 1.2, ease: 'easeOut' }}
+          className="mb-20"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-[1px] bg-black/20" />
+            <span className="text-sm tracking-[0.3em] uppercase text-black/60 font-mono">
+              INNOVATIONS
+            </span>
+          </div>
+          <h2 className="text-5xl md:text-7xl font-bold uppercase tracking-tight text-black font-mono">
             專利發明
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            創新技術的結晶，每一項專利都代表著對未來科技的探索與貢獻
-          </p>
         </motion.div>
 
-        {/* 分類篩選 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-4 mb-12"
-        >
-          <div className="flex items-center gap-2 text-gray-500 mr-4">
-            <Filter size={20} />
-            <span>分類篩選：</span>
-          </div>
-          
-          {categories.map((category) => (
-            <motion.button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-3 rounded-full transition-all duration-300 ${
-                selectedCategory === category
-                  ? 'bg-black text-white shadow-lg'
-                  : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {category}
-            </motion.button>
-          ))}
-        </motion.div>
-
-        {/* 專利展示網格 */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-        >
-          {Array.isArray(filteredPatents) && filteredPatents.map((patent) => (
-            <motion.div
-              key={patent.id}
-              variants={itemVariants}
-              className="group perspective-1000"
-            >
-              <Card className="p-8 h-full hover:shadow-2xl">
-                <div className="flex items-start justify-between mb-6">
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    patent.status === '已核准' || patent.status === '已授權' ? 'bg-green-100 text-green-700' : 
-                    patent.status === '審查中' || patent.status === 'pending' ? 'bg-blue-100 text-blue-700' : 
-                    'bg-gray-100 text-gray-700'
-                  }`}>
-                    {patent.status}
-                  </div>
-                  
-                  <motion.div
-                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    whileHover={{ rotate: 180 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <FileText size={20} className="text-gray-400" />
-                  </motion.div>
-                </div>
-
-                <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                  {patent.title}
-                </h3>
-
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {patent.description}
-                </p>
-
-                <div className="space-y-3">
-                  {patent.patentNumber && (
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Award size={16} className="mr-2" />
-                      <span>專利號：{patent.patentNumber}</span>
+        <div className="relative">
+          {/* 專利列表 */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="space-y-0"
+          >
+            {patents.map((patent, index) => (
+              <motion.div
+                key={patent.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.8,
+                    delay: index * 0.1,
+                    ease: [0.19, 1, 0.22, 1]
+                  }
+                } : {}}
+                onMouseEnter={() => setHoveredId(patent.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                className="group relative border-b border-black/10 py-10 cursor-pointer transition-all duration-500 hover:px-8"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    {/* 年份和狀態 */}
+                    <div className="flex items-center gap-6 mb-4">
+                      <span className="text-sm font-mono text-black/40 uppercase tracking-widest">
+                        {patent.filingDate ? new Date(patent.filingDate).getFullYear() : 'PENDING'}
+                      </span>
+                      <div className={`text-xs font-mono uppercase tracking-widest ${
+                        patent.status === '已核准' || patent.status === '已授權' ? 'text-green-600' :
+                        patent.status === '審查中' || patent.status === 'pending' ? 'text-blue-600' :
+                        'text-gray-500'
+                      }`}>
+                        {patent.status}
+                      </div>
+                      <div className="text-xs font-mono uppercase tracking-widest text-black/40">
+                        {patent.category}
+                      </div>
                     </div>
-                  )}
-                  
-                  {patent.filingDate && (
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Calendar size={16} className="mr-2" />
-                      <span>申請日期：{formatDate(patent.filingDate)}</span>
-                    </div>
-                  )}
 
-                  {patent.grantDate && (
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Calendar size={16} className="mr-2" />
-                      <span>授權日期：{formatDate(patent.grantDate)}</span>
-                    </div>
-                  )}
-                </div>
+                    {/* 標題 */}
+                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 tracking-tight text-gray-900 transition-all duration-500 group-hover:translate-x-4">
+                      {patent.title}
+                    </h3>
 
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900 bg-gray-100 px-3 py-1 rounded-full">
-                      {patent.category || '專利'}
-                    </span>
-                    
-                    <div className="flex flex-col gap-2">
-                      {patent.patentUrl ? (
-                        <a
-                          href={patent.patentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center gap-1 transition-all duration-200 hover:translate-x-1"
-                          title="點擊查看專利文件（若遇到系統錯誤請稍後再試）"
-                        >
-                          查看專利文件 →
-                        </a>
-                      ) : (
-                        <span className="text-gray-400 text-sm">
-                          暫無專利文件
-                        </span>
+                    {/* 描述 */}
+                    <p className="text-sm md:text-base text-gray-700 max-w-3xl leading-relaxed transition-all duration-500 group-hover:text-gray-900">
+                      {patent.description}
+                    </p>
+
+                    {/* 專利資訊 */}
+                    <div className="flex items-center gap-8 mt-6 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                      {patent.patentNumber && (
+                        <div className="flex items-center gap-2 text-sm text-black/50">
+                          <Award size={14} />
+                          <span className="font-mono">{patent.patentNumber}</span>
+                        </div>
+                      )}
+                      {patent.grantDate && (
+                        <div className="flex items-center gap-2 text-sm text-black/50">
+                          <Calendar size={14} />
+                          <span className="font-mono">授權: {formatDate(patent.grantDate)}</span>
+                        </div>
                       )}
                     </div>
                   </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
 
-        {(!Array.isArray(filteredPatents) || filteredPatents.length === 0) && (
+                  {/* 箭頭 */}
+                  <motion.div
+                    className="flex items-center justify-center w-12 h-12 ml-8"
+                    animate={{
+                      x: hoveredId === patent.id ? 10 : 0,
+                      opacity: hoveredId === patent.id ? 1 : 0.3
+                    }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                  >
+                    <ArrowRight size={24} className="text-black" />
+                  </motion.div>
+                </div>
+
+                {/* 連結 */}
+                {patent.patentUrl && (
+                  <a
+                    href={patent.patentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute inset-0 z-10"
+                    aria-label={`查看 ${patent.title} 專利文件`}
+                  />
+                )}
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* 空狀態 */}
+          {(!Array.isArray(patents) || patents.length === 0) && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-20"
+            >
+              <div className="w-32 h-32 mx-auto mb-8 border-2 border-black/10 rounded-full flex items-center justify-center">
+                <Award size={48} className="text-black/20" />
+              </div>
+              <p className="text-2xl font-mono uppercase tracking-widest text-black/30 mb-4">
+                NO PATENTS YET
+              </p>
+              <p className="text-sm font-mono text-black/20 uppercase tracking-widest">
+                專利資料即將上線
+              </p>
+            </motion.div>
+          )}
+        </div>
+
+        {/* 底部統計 */}
+        {patents.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ duration: 1, delay: 0.8 }}
+            className="mt-20 pt-12 border-t border-black/10 flex items-center justify-between"
           >
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center">
-              <FileText size={40} className="text-gray-400" />
+            <div className="flex items-center gap-8 md:gap-12">
+              <div>
+                <p className="text-2xl md:text-3xl font-bold font-mono text-gray-900">{patents.length}</p>
+                <p className="text-xs md:text-sm font-mono uppercase tracking-widest text-gray-600 mt-1">
+                  Total Patents
+                </p>
+              </div>
+              <div>
+                <p className="text-2xl md:text-3xl font-bold font-mono text-gray-900">
+                  {patents.filter(p => p.status === '已核准' || p.status === '已授權').length}
+                </p>
+                <p className="text-xs md:text-sm font-mono uppercase tracking-widest text-gray-600 mt-1">
+                  Granted
+                </p>
+              </div>
+              <div>
+                <p className="text-2xl md:text-3xl font-bold font-mono text-gray-900">
+                  {patents.filter(p => p.status === '審查中' || p.status === 'pending').length}
+                </p>
+                <p className="text-xs md:text-sm font-mono uppercase tracking-widest text-gray-600 mt-1">
+                  Pending
+                </p>
+              </div>
             </div>
-            <p className="text-gray-500 text-lg mb-2">{selectedCategory === '全部' ? '暫無專利資料' : '此分類暫無專利資料'}</p>
-            <p className="text-gray-400 text-sm">請前往管理後台添加專利</p>
           </motion.div>
         )}
       </div>

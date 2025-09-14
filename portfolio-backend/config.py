@@ -40,13 +40,21 @@ class Config:
     # CORS 配置 - 包含本地和線上域名
     CORS_ORIGINS = [
         'http://localhost:3000',
-        'http://localhost:3001', 
+        'http://localhost:3001',
         'http://localhost:3002',  # 添加 3002 端口
         'http://localhost:3004',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:3001',
         'http://127.0.0.1:3002',  # 添加 3002 端口
         'http://127.0.0.1:3004',
+        'http://192.168.254.48:3000',  # 局域網 IP
+        'http://192.168.254.48:3001',
+        'http://192.168.254.48:3002',
+        'http://192.168.254.48:3004',
+        'http://192.168.254.0:3000',  # 允許同網段任何 IP
+        'http://192.168.254.0:3001',
+        'http://192.168.254.0:3002',
+        'http://192.168.254.0:3004',
         'https://changyen.zeabur.app',  # 前端正式域名
         'https://changyen-backend.zeabur.app',  # 後端域名
     ]

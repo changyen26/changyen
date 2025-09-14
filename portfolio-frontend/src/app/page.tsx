@@ -1,6 +1,6 @@
 'use client';
 
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import Navigation from '../components/common/Navigation';
 import HeroSection from '../components/sections/HeroSection';
 import Preloader from '../components/animations/Preloader';
@@ -21,6 +21,11 @@ const SectionLoader = () => (
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
+
+  // 頁面載入時滾動到頂部
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handlePreloaderComplete = () => {
     setIsLoading(false);

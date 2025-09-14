@@ -84,29 +84,42 @@ def create_app(config_name=None):
     # 初始化擴展
     db.init_app(app)
 
-    # 增強 CORS 安全配置
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": app.config['CORS_ORIGINS'],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "Cache-Control", "Pragma"],
-            "supports_credentials": True,
-            "max_age": 86400  # 24小時預檢緩存
-        },
-        r"/auth/*": {
-            "origins": app.config['CORS_ORIGINS'],
-            "methods": ["POST", "OPTIONS"],  # 僅允許必要方法
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True,
-            "max_age": 86400
-        },
-        r"/uploads/*": {
-            "origins": app.config['CORS_ORIGINS'],
-            "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type"],
-            "max_age": 86400
-        }
-    })
+    # 增強 CORS 安全配置 - 開發環境下允許所有局域網 IP
+    if app.config.get('DEBUG'):
+        # 開發模式：允許所有來源（包括局域網）
+        CORS(app, resources={
+            r"/*": {
+                "origins": "*",  # 開發環境允許所有來源
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "allow_headers": ["Content-Type", "Authorization", "Cache-Control", "Pragma"],
+                "supports_credentials": True,
+                "max_age": 86400
+            }
+        })
+    else:
+        # 生產模式：嚴格限制來源
+        CORS(app, resources={
+            r"/api/*": {
+                "origins": app.config['CORS_ORIGINS'],
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "allow_headers": ["Content-Type", "Authorization", "Cache-Control", "Pragma"],
+                "supports_credentials": True,
+                "max_age": 86400  # 24小時預檢緩存
+            },
+            r"/auth/*": {
+                "origins": app.config['CORS_ORIGINS'],
+                "methods": ["POST", "OPTIONS"],  # 僅允許必要方法
+                "allow_headers": ["Content-Type", "Authorization"],
+                "supports_credentials": True,
+                "max_age": 86400
+            },
+            r"/uploads/*": {
+                "origins": app.config['CORS_ORIGINS'],
+                "methods": ["GET", "POST", "OPTIONS"],
+                "allow_headers": ["Content-Type"],
+                "max_age": 86400
+            }
+        })
     migrate = Migrate(app, db)
 
     # 安全設置 - 隱藏技術資訊

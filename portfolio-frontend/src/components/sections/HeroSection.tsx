@@ -197,12 +197,14 @@ export default function HeroSection() {
           opacity: Math.max(0, Math.min(0.08, 0.08 - scrollY / 1500))
         }}
       >
-        <div className="text-center overflow-hidden w-full">
+        <div className="text-center w-full">
           <motion.h2
-            className="font-bold font-mono uppercase text-black/8 leading-none select-none pointer-events-none whitespace-nowrap"
+            className="font-bold font-mono uppercase text-black/8 leading-none select-none pointer-events-none"
             style={{
-              fontSize: `clamp(1rem, 4.5vw, 6rem)`,
-              letterSpacing: scrollY > 200 ? '0.2em' : '0.1em'
+              fontSize: `clamp(0.8rem, 3.5vw, 5rem)`,
+              letterSpacing: scrollY > 200 ? '0.15em' : '0.08em',
+              whiteSpace: 'normal',
+              wordBreak: 'keep-all'
             }}
             animate={{
               letterSpacing: scrollY > 200 ? '0.2em' : '0.1em'
