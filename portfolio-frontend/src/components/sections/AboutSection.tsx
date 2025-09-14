@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 import { Code, Lightbulb, Users, Target, Mail } from 'lucide-react';
 import { useInView } from '../../hooks/useInView';
 import { useScroll } from '../../hooks/useScroll';
@@ -142,7 +143,7 @@ export default function AboutSection() {
       y: 0,
       transition: {
         duration: 0.8,
-        ease: "easeOut"
+        ease: "easeOut" as Easing
       }
     }
   };
@@ -288,7 +289,7 @@ export default function AboutSection() {
                     className="h-full bg-black"
                     initial={{ width: 0 }}
                     animate={isSkillsInView ? { width: `${skill.level}%` } : { width: 0 }}
-                    transition={{ duration: 2.5, delay: index * 0.3, ease: "easeOut" }}
+                    transition={{ duration: 2.5, delay: index * 0.3, ease: "easeOut" as Easing }}
                   />
                 </div>
               </motion.div>

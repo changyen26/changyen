@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 import { useInView } from '@/hooks/useInView';
 import { ReactNode } from 'react';
 
@@ -67,7 +68,7 @@ export default function ScrollReveal({
       transition={{
         duration,
         delay,
-        ease: "easeOut"
+        ease: "easeOut" as Easing
       }}
       className={className}
     >

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 import { logger } from '../../lib/logger';
 import { Newspaper, Calendar, ExternalLink, Eye } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -80,7 +81,7 @@ export default function NewsSection() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          transition={{ duration: 0.8, ease: 'easeOut' as Easing }}
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -164,7 +165,7 @@ export default function NewsSection() {
                       height: selectedArticle === article.id ? 'auto' : 0,
                       opacity: selectedArticle === article.id ? 1 : 0
                     }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' as Easing }}
                     className="overflow-hidden"
                   >
                     <div className="pt-4 mt-4 border-t border-gray-200">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 
 interface PreloaderProps {
   onComplete: () => void;
@@ -44,7 +45,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       transition: {
         duration: 0.8,
         delay: i * 0.1,
-        ease: [0.19, 1, 0.22, 1] // cubic-bezier(.19,1,.22,1)
+        ease: [0.19, 1, 0.22, 1] as Easing // cubic-bezier(.19,1,.22,1)
       }
     }),
     exit: {
@@ -52,7 +53,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       opacity: 0,
       transition: {
         duration: 0.6,
-        ease: [0.19, 1, 0.22, 1]
+        ease: [0.19, 1, 0.22, 1] as Easing
       }
     }
   };
@@ -63,14 +64,14 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       scaleX: progress / 100,
       transition: {
         duration: 0.2,
-        ease: 'easeOut'
+        ease: 'easeOut' as Easing
       }
     },
     exit: {
       scaleX: 1,
       transition: {
         duration: 0.5,
-        ease: [0.19, 1, 0.22, 1]
+        ease: [0.19, 1, 0.22, 1] as Easing
       }
     }
   };

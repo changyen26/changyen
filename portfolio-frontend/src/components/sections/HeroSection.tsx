@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { gsap } from 'gsap';
 import { UserInfo } from '../../types/admin';
@@ -115,7 +116,7 @@ export default function HeroSection() {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
+          transition={{ duration: 1.2, ease: 'easeOut' as Easing }}
           className="mb-16"
         >
           <div className="w-2 h-2 mx-auto mb-8 bg-black rounded-full" />
@@ -209,7 +210,7 @@ export default function HeroSection() {
             animate={{
               letterSpacing: scrollY > 200 ? '0.2em' : '0.1em'
             }}
-            transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
+            transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] as Easing }}
           >
             物聯網｜壓電薄膜｜半導體｜全端
           </motion.h2>

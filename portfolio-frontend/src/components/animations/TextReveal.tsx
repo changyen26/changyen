@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 
 interface TextRevealProps {
   children: React.ReactNode;
@@ -41,7 +42,7 @@ export default function TextReveal({
       opacity: 1,
       transition: {
         duration,
-        ease: [0.19, 1, 0.22, 1] // Jan Raven's cubic-bezier
+        ease: [0.19, 1, 0.22, 1] as Easing // Jan Raven's cubic-bezier
       }
     }
   };

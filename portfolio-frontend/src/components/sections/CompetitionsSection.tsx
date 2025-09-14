@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { logger } from '../../lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 import { Trophy } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
 import { useInView } from '../../hooks/useInView';
@@ -99,7 +100,7 @@ export default function CompetitionsSection() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
+          transition={{ duration: 1.2, ease: 'easeOut' as Easing }}
           className="mb-20"
         >
           <div className="flex items-center gap-4 mb-4">
@@ -117,7 +118,7 @@ export default function CompetitionsSection() {
         <motion.div
           className="space-y-0"
           layout
-          transition={{ layout: { duration: 0.5, ease: [0.4, 0, 0.2, 1] } }}
+          transition={{ layout: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as Easing } }}
         >
           {competitions.map((competition, index) => (
             <motion.div
@@ -128,12 +129,12 @@ export default function CompetitionsSection() {
                 transition: {
                   duration: 0.6,
                   delay: index * 0.08,
-                  ease: [0.19, 1, 0.22, 1]
+                  ease: [0.19, 1, 0.22, 1] as Easing
                 }
               } : {}}
               layout
               transition={{
-                layout: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+                layout: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as Easing },
                 opacity: { duration: 0.3 }
               }}
               className="border-b border-black/10 last:border-b-0 overflow-hidden cursor-pointer group"
@@ -161,11 +162,11 @@ export default function CompetitionsSection() {
                   }}
                   transition={{
                     opacity: expandedId === competition.id ?
-                      { duration: 0.1, ease: "easeOut" } :
-                      { duration: 0.2, ease: "easeIn", delay: 0.35 },
+                      { duration: 0.1, ease: "easeOut" as Easing } :
+                      { duration: 0.2, ease: "easeIn" as Easing, delay: 0.35 },
                     height: expandedId === competition.id ?
-                      { duration: 0.15, ease: "easeOut" } :
-                      { duration: 0.4, ease: [0.4, 0, 0.2, 1], delay: 0.2 }
+                      { duration: 0.15, ease: "easeOut" as Easing } :
+                      { duration: 0.4, ease: [0.4, 0, 0.2, 1] as Easing, delay: 0.2 }
                   }}
                   className="overflow-hidden"
                 >
@@ -212,7 +213,7 @@ export default function CompetitionsSection() {
                       height: 'auto',
                       opacity: 1,
                       transition: {
-                        height: { duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98], delay: 0.1 },
+                        height: { duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] as Easing, delay: 0.1 },
                         opacity: { duration: 0.3, delay: 0.2 }
                       }
                     }}
@@ -221,7 +222,7 @@ export default function CompetitionsSection() {
                       height: 0,
                       transition: {
                         opacity: { duration: 0.15 },
-                        height: { duration: 0.5, ease: [0.4, 0, 0.2, 1] }
+                        height: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as Easing }
                       }
                     }}
                     className="overflow-hidden pb-8 relative"
@@ -236,7 +237,7 @@ export default function CompetitionsSection() {
                         transition: {
                           delay: 0.35,
                           duration: 0.4,
-                          ease: [0.04, 0.62, 0.23, 0.98]
+                          ease: [0.04, 0.62, 0.23, 0.98] as Easing
                         }
                       }}
                     >
@@ -265,7 +266,7 @@ export default function CompetitionsSection() {
                             transition: {
                               delay: 0.4,
                               duration: 0.4,
-                              ease: [0.04, 0.62, 0.23, 0.98]
+                              ease: [0.04, 0.62, 0.23, 0.98] as Easing
                             }
                           }}
                         >
@@ -337,7 +338,7 @@ export default function CompetitionsSection() {
                             transition: {
                               delay: 0.5,
                               duration: 0.4,
-                              ease: [0.04, 0.62, 0.23, 0.98]
+                              ease: [0.04, 0.62, 0.23, 0.98] as Easing
                             }
                           }}
                         >
@@ -371,7 +372,7 @@ export default function CompetitionsSection() {
                                 transition: {
                                   delay: 0.4,
                                   duration: 0.6,
-                                  ease: [0.04, 0.62, 0.23, 0.98]
+                                  ease: [0.04, 0.62, 0.23, 0.98] as Easing
                                 }
                               }}
                             >
@@ -389,7 +390,7 @@ export default function CompetitionsSection() {
                                 transition: {
                                   delay: 0.5,
                                   duration: 0.5,
-                                  ease: [0.04, 0.62, 0.23, 0.98]
+                                  ease: [0.04, 0.62, 0.23, 0.98] as Easing
                                 }
                               }}
                             >
@@ -417,7 +418,7 @@ export default function CompetitionsSection() {
                               transition: {
                                 delay: 0.6,
                                 duration: 0.4,
-                                ease: [0.04, 0.62, 0.23, 0.98]
+                                ease: [0.04, 0.62, 0.23, 0.98] as Easing
                               }
                             }}
                           >
@@ -435,7 +436,7 @@ export default function CompetitionsSection() {
                               transition: {
                                 delay: 0.7,
                                 duration: 0.4,
-                                ease: [0.04, 0.62, 0.23, 0.98]
+                                ease: [0.04, 0.62, 0.23, 0.98] as Easing
                               }
                             }}
                           >
@@ -458,7 +459,7 @@ export default function CompetitionsSection() {
                           transition: {
                             delay: 0.6,
                             duration: 0.5,
-                            ease: [0.04, 0.62, 0.23, 0.98]
+                            ease: [0.04, 0.62, 0.23, 0.98] as Easing
                           }
                         }}
                       >

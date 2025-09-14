@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { useScroll } from '../../hooks/useScroll';
 import { cn } from '../../lib/utils';
@@ -92,7 +93,7 @@ export default function Navigation() {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: isVisible ? 0 : -100 }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      transition={{ duration: 0.3, ease: 'easeInOut' as Easing }}
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         scrollY > 50

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 import { logger } from '../../lib/logger';
 import { Calendar, Award, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -48,7 +49,7 @@ export default function PatentsSection() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
+          transition={{ duration: 1.2, ease: 'easeOut' as Easing }}
           className="mb-20"
         >
           <div className="flex items-center gap-4 mb-4">
@@ -80,7 +81,7 @@ export default function PatentsSection() {
                   transition: {
                     duration: 0.8,
                     delay: index * 0.1,
-                    ease: [0.19, 1, 0.22, 1]
+                    ease: [0.19, 1, 0.22, 1] as Easing
                   }
                 } : {}}
                 onMouseEnter={() => setHoveredId(patent.id)}
@@ -140,7 +141,7 @@ export default function PatentsSection() {
                       x: hoveredId === patent.id ? 10 : 0,
                       opacity: hoveredId === patent.id ? 1 : 0.3
                     }}
-                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    transition={{ duration: 0.3, ease: 'easeOut' as Easing }}
                   >
                     <ArrowRight size={24} className="text-black" />
                   </motion.div>

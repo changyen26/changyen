@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 import { ReactNode, useState } from 'react';
 
 interface AnimatedLinkProps {
@@ -34,7 +35,7 @@ export default function AnimatedLink({
       originX: 0,
       transition: {
         duration: 0.8,
-        ease: [0.19, 1, 0.22, 1] // Jan Raven's cubic-bezier
+        ease: [0.19, 1, 0.22, 1] as Easing // Jan Raven's cubic-bezier
       }
     },
     tap: {
@@ -42,7 +43,7 @@ export default function AnimatedLink({
       originX: 0,
       transition: {
         duration: 0.3,
-        ease: [0.19, 1, 0.22, 1]
+        ease: [0.19, 1, 0.22, 1] as Easing
       }
     }
   };
@@ -55,7 +56,7 @@ export default function AnimatedLink({
       y: -1,
       transition: {
         duration: 0.3,
-        ease: [0.19, 1, 0.22, 1]
+        ease: [0.19, 1, 0.22, 1] as Easing
       }
     }
   };
@@ -110,7 +111,7 @@ export default function AnimatedLink({
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{
             duration: 0.4,
-            ease: [0.19, 1, 0.22, 1]
+            ease: [0.19, 1, 0.22, 1] as Easing
           }}
           style={{
             background: 'radial-gradient(circle, currentColor 0%, transparent 70%)'

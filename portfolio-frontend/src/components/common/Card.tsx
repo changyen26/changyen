@@ -1,5 +1,6 @@
 import { HTMLAttributes, forwardRef } from 'react';
 import { motion } from 'framer-motion';
+import type { Easing } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
 interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 
@@ -26,7 +27,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         } : {}}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        transition={{ duration: 0.5, ease: 'easeOut' as Easing }}
         {...props}
       >
         {children}
