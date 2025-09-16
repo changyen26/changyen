@@ -3,6 +3,7 @@ const nextConfig = {
   output: 'standalone',
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
   // 安全標頭配置
   async headers() {
