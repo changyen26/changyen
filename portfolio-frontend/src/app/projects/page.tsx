@@ -13,9 +13,9 @@ interface Project {
   title: string;
   description: string;
   technologies: string[];
-  imageUrl: string;
-  githubUrl: string;
-  liveUrl: string;
+  imageUrl?: string;
+  githubUrl?: string;
+  liveUrl?: string;
   featured: boolean;
   createdAt: string;
 }
@@ -31,24 +31,6 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
-  hidden: {
-    opacity: 0,
-    y: 30,
-    scale: 0.95
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 15,
-      duration: 0.6
-    }
-  },
-};
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
   const [imageError, setImageError] = useState(false);
@@ -67,7 +49,9 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
 
   return (
     <motion.div
-      variants={itemVariants}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
       className={`bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden group hover:border-gray-700 transition-all duration-500 ${
         index === 0 && project.featured ? 'md:col-span-2 md:row-span-2' : ''
       }`}
