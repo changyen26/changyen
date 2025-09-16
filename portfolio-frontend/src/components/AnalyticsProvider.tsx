@@ -15,7 +15,8 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   // 啟用自動追蹤
   useAutoTracking();
 
-  return <>{children}</>;
+  // 直接返回 children，避免使用 Fragment 造成 hydration 問題
+  return children as React.ReactElement;
 }
 
 export default AnalyticsProvider;

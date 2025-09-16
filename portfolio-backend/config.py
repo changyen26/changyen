@@ -55,7 +55,9 @@ class Config:
         'http://192.168.254.0:3001',
         'http://192.168.254.0:3002',
         'http://192.168.254.0:3004',
-        'https://changyen.zeabur.app',  # 前端正式域名
+        'https://changyen.app',  # 主域名
+        'https://www.changyen.app',  # www 子域名
+        'https://changyen.zeabur.app',  # Zeabur 前端域名
         'https://changyen-backend.zeabur.app',  # 後端域名
     ]
 
