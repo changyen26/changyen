@@ -7,6 +7,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import json
+import uuid
 
 db = SQLAlchemy()
 
@@ -407,4 +408,32 @@ class Patent(db.Model):
             'classification': self.classification,
             'featured': self.featured,
             'createdAt': self.created_at.isoformat() if self.created_at else None
+        }
+class AboutValue(db.Model):
+    """關於我區塊的翻卡內容模型"""
+    __tablename__ = 'about_values'
+    
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    icon = db.Column(db.String(50), nullable=False)  # icon 名稱，如 'Lightbulb', 'Code', 'Users', 'Target'
+    title = db.Column(db.String(100), nullable=False)  # 中文標題
+    subtitle = db.Column(db.String(100))  # 英文副標題
+    description = db.Column(db.Text)  # 詳細描述
+    details = db.Column(db.JSON)  # 詳細項目列表
+    order_index = db.Column(db.Integer, default=0)  # 顯示順序
+    is_active = db.Column(db.Boolean, default=True)  # 是否啟用
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'icon': self.icon,
+            'title': self.title,
+            'subtitle': self.subtitle,
+            'description': self.description,
+            'details': self.details if self.details else [],
+            'orderIndex': self.order_index,
+            'isActive': self.is_active,
+            'createdAt': self.created_at.isoformat() if self.created_at else None,
+            'updatedAt': self.updated_at.isoformat() if self.updated_at else None
         }

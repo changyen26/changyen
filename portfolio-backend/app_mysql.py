@@ -15,7 +15,7 @@ import base64
 import re
 from config import config
 from models import (
-    db, User, Competition, Project, Skill, News, Patent, MediaCoverage, UploadedFile, PageView, VisitorSession
+    db, User, Competition, Project, Skill, News, Patent, MediaCoverage, UploadedFile, PageView, VisitorSession, AboutValue
 )
 
 def parse_user_agent(user_agent):
@@ -885,8 +885,103 @@ def register_routes(app):
             "message": "中文處理成功"
         })
 
-    # ===== 文件管理 =====
-    @app.route('/api/v1/files', methods=['POST'])
+    # ===== About Values 管理 =====
+    @app.route('/api/v1/about-values', methods=['GET'])
+    def get_about_values():
+        """獲取所有About翻卡內容"""
+        try:
+            about_values = AboutValue.query.filter_by(is_active=True).order_by(AboutValue.order_index).all()
+            return jsonify([value.to_dict() for value in about_values])
+        except Exception as e:
+            return jsonify({"error": f"獲取About內容失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/about-values', methods=['POST'])
+    def create_about_value():
+        """創建新的About翻卡內容"""
+        try:
+            data = request.get_json()
+
+            about_value = AboutValue()
+            about_value.id = str(uuid.uuid4())
+            about_value.icon = data.get('icon', 'Code')
+            about_value.title = data.get('title', '')
+            about_value.subtitle = data.get('subtitle', '')
+            about_value.description = data.get('description', '')
+            about_value.details = data.get('details', [])
+            about_value.order_index = data.get('orderIndex', 0)
+            about_value.is_active = data.get('isActive', True)
+
+            db.session.add(about_value)
+            db.session.commit()
+
+            return jsonify(about_value.to_dict()), 201
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"創建About內容失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/about-values/<value_id>', methods=['PUT'])
+    def update_about_value(value_id):
+        """更新About翻卡內容"""
+        try:
+            about_value = AboutValue.query.get(value_id)
+            if not about_value:
+                return jsonify({"error": "找不到該內容"}), 404
+
+            data = request.get_json()
+
+            about_value.icon = data.get('icon', about_value.icon)
+            about_value.title = data.get('title', about_value.title)
+            about_value.subtitle = data.get('subtitle', about_value.subtitle)
+            about_value.description = data.get('description', about_value.description)
+            about_value.details = data.get('details', about_value.details)
+            about_value.order_index = data.get('orderIndex', about_value.order_index)
+            about_value.is_active = data.get('isActive', about_value.is_active)
+
+            db.session.commit()
+
+            return jsonify(about_value.to_dict())
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"更新About內容失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/about-values/<value_id>', methods=['DELETE'])
+    def delete_about_value(value_id):
+        """刪除About翻卡內容"""
+        try:
+            about_value = AboutValue.query.get(value_id)
+            if not about_value:
+                return jsonify({"error": "找不到該內容"}), 404
+
+            db.session.delete(about_value)
+            db.session.commit()
+
+            return jsonify({"message": "About內容已刪除"})
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"刪除About內容失敗: {str(e)}"}), 500
+
+    @app.route('/api/v1/about-values/reorder', methods=['POST'])
+    def reorder_about_values():
+        """重新排序About翻卡內容"""
+        try:
+            data = request.get_json()
+            ordered_ids = data.get('orderedIds', [])
+
+            for index, value_id in enumerate(ordered_ids):
+                about_value = AboutValue.query.get(value_id)
+                if about_value:
+                    about_value.order_index = index
+
+            db.session.commit()
+
+            return jsonify({"message": "排序已更新"})
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"更新排序失敗: {str(e)}"}), 500    @app.route('/api/v1/files', methods=['POST'])
     def upload_file():
         """上傳文件"""
         try:

@@ -1,6 +1,12 @@
 // 管理後台API功能
 import { UserInfo, Project, Skill, Competition, Patent, MediaCoverage, FileData } from '../types/admin';
 import { logger } from './logger';
+// API 響應介面
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
 
 // 分析數據介面
 interface AnalyticsData {
@@ -261,21 +267,29 @@ class AdminApiService {
   }
 
   // 專案管理
-  async getProjects(): Promise<Project[]> {
+  async getProjects(): Promise<ApiResponse<Project[]>> {
     try {
       if (API_BASE_URL) {
         const response = await fetch(`${API_BASE_URL}/api/v1/projects`);
-        return await response.json();
+        if (response.ok) {
+          const data = await response.json();
+          return { success: true, data };
+        } else {
+          const error = await response.text();
+          logger.error("Failed to fetch projects from API:", error);
+          return { success: false, error: `API 錯誤: ${response.status}` };
+        }
       } else {
         const stored = localStorage.getItem(this.STORAGE_KEYS.PROJECTS);
-        return stored ? JSON.parse(stored) : [];
+        const data = stored ? JSON.parse(stored) : [];
+        return { success: true, data };
       }
     } catch (error) {
-      logger.error('Failed to get projects:', error);
-      return [];
+      logger.error("Failed to get projects:", error);
+      return { success: false, error: "載入專案資料失敗" };
     }
-  }
 
+  }
   async createProject(project: Omit<Project, 'id'>): Promise<boolean> {
     try {
       const newProject = {
@@ -292,9 +306,10 @@ class AdminApiService {
         });
         return response.ok;
       } else {
-        const projects = await this.getProjects();
-        projects.push(newProject);
-        localStorage.setItem(this.STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
+        const projectsResponse = await this.getProjects();
+        if (!projectsResponse.success || !projectsResponse.data) return false;
+        projectsResponse.data.push(newProject);
+        localStorage.setItem(this.STORAGE_KEYS.PROJECTS, JSON.stringify(projectsResponse.data));
         return true;
       }
     } catch (error) {
@@ -313,11 +328,7 @@ class AdminApiService {
         });
         return response.ok;
       } else {
-        const projects = await this.getProjects();
-        const index = projects.findIndex(p => p.id === project.id);
-        if (index !== -1) {
-          projects[index] = project;
-          localStorage.setItem(this.STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
+        const projectsResponse = await this.getProjects();        if (!projectsResponse.success || !projectsResponse.data) return false;        const index = projectsResponse.data.findIndex(p => p.id === project.id);        if (index !== -1) {          projectsResponse.data[index] = project;          localStorage.setItem(this.STORAGE_KEYS.PROJECTS, JSON.stringify(projectsResponse.data));
           return true;
         }
         return false;
@@ -336,9 +347,7 @@ class AdminApiService {
         });
         return response.ok;
       } else {
-        const projects = await this.getProjects();
-        const filtered = projects.filter(p => p.id !== id);
-        localStorage.setItem(this.STORAGE_KEYS.PROJECTS, JSON.stringify(filtered));
+        const projectsResponse = await this.getProjects();        if (!projectsResponse.success || !projectsResponse.data) return false;        const filtered = projectsResponse.data.filter(p => p.id !== id);        localStorage.setItem(this.STORAGE_KEYS.PROJECTS, JSON.stringify(filtered));
         return true;
       }
     } catch (error) {
@@ -966,7 +975,87 @@ class AdminApiService {
   }
 
   // 新聞管理
-  async getNews(): Promise<NewsItem[]> {
+  // About Values 管理
+  async getAboutValues(): Promise<any[]> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/about-values`);
+        if (response.ok) {
+          return await response.json();
+        }
+      }
+      return [];
+    } catch (error) {
+      logger.error('Failed to fetch about values:', error);
+      return [];
+    }
+  }
+
+  async createAboutValue(data: any): Promise<boolean> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/about-values`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        return response.ok;
+      }
+      return false;
+    } catch (error) {
+      logger.error('Failed to create about value:', error);
+      return false;
+    }
+  }
+
+  async updateAboutValue(id: string, data: any): Promise<boolean> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/about-values/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        return response.ok;
+      }
+      return false;
+    } catch (error) {
+      logger.error('Failed to update about value:', error);
+      return false;
+    }
+  }
+
+  async deleteAboutValue(id: string): Promise<boolean> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/about-values/${id}`, {
+          method: 'DELETE',
+        });
+        return response.ok;
+      }
+      return false;
+    } catch (error) {
+      logger.error('Failed to delete about value:', error);
+      return false;
+    }
+  }
+
+  async reorderAboutValues(orderedIds: string[]): Promise<boolean> {
+    try {
+      if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/api/v1/about-values/reorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderedIds }),
+        });
+        return response.ok;
+      }
+      return false;
+    } catch (error) {
+      logger.error('Failed to reorder about values:', error);
+      return false;
+    }
+  }  async getNews(): Promise<NewsItem[]> {
     try {
       if (API_BASE_URL) {
         const response = await fetch(`${API_BASE_URL}/api/v1/news`);
@@ -1012,8 +1101,7 @@ class AdminApiService {
   async exportData(): Promise<ExportData> {
     const userInfo = await this.getUserInfo();
     const analytics = await this.getAnalytics();
-    const projects = await this.getProjects();
-    const skills = await this.getSkills();
+    const projectsResponse = await this.getProjects();    const projects = projectsResponse.success && projectsResponse.data ? projectsResponse.data : [];    const skills = await this.getSkills();
     const competitions = await this.getCompetitions();
     const news = await this.getNews();
     

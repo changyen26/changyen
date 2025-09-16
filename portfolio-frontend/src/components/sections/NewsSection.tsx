@@ -1,10 +1,10 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { Easing } from 'framer-motion';
 import { logger } from '../../lib/logger';
 import { ArrowRight } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { formatDate } from '../../lib/utils';
 import { useInView } from '../../hooks/useInView';
 import { MediaCoverage } from '../../types/admin';
@@ -12,8 +12,6 @@ import { adminApi } from '../../lib/adminApi';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function NewsSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [sectionRef, isInView] = useInView({ threshold: 0.1 });
   const [news, setNews] = useState<MediaCoverage[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -26,9 +24,6 @@ export default function NewsSection() {
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + news.length) % news.length);
   };
-
-  // 計算滑動距離
-  const translateX = -currentIndex * 100;
 
   // 觸控滑動支援
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -92,23 +87,23 @@ export default function NewsSection() {
               publicationDate: '2024-01-10',
               url: '#',
               summary: '深入分析區塊鏈技術如何改變傳統供應鏈管理模式，提升透明度和效率，為企業創造更大價值。',
-              mediaType: '技術創新',
+              mediaType: '專題報導',
               featured: false
             },
             {
               id: '3',
-              title: '下一代量子計算的突破性進展',
-              mediaName: 'MIT Review',
+              title: '5G時代的創新機遇與商業應用解析',
+              mediaName: 'Wired',
               publicationDate: '2024-01-05',
               url: '#',
-              summary: '報導最新量子計算研究成果，展示其在密碼學、藥物研發等領域的潛在應用價值。',
-              mediaType: '技術創新',
-              featured: false
+              summary: '全面解析5G技術如何推動各行各業的數字化轉型，從自動駕駛到遠程醫療，探索無限可能。',
+              mediaType: '產業評論',
+              featured: true
             }
           ]);
         }
       } catch (error) {
-        logger.error('Failed to load media coverage from API:', error);
+        logger.error('Failed to load media coverage:', error);
         setNews([]);
       }
     };
@@ -119,132 +114,153 @@ export default function NewsSection() {
   return (
     <section
       id="news"
-      ref={containerRef}
-      className="relative bg-white min-h-screen"
+      ref={sectionRef}
+      className="py-32 bg-white"
     >
-      <div
-        ref={sectionRef}
-        className="h-screen overflow-hidden"
-      >
-        <div className="h-full flex flex-col">
-          {/* 固定標題區 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            transition={{ duration: 1.2, ease: 'easeOut' as Easing }}
-            className="pt-32 pl-8 md:pl-16 pb-8 flex-shrink-0"
-          >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-[1px] bg-black/20" />
-              <span className="text-sm tracking-[0.3em] uppercase text-black/60 font-mono">
-                MEDIA COVERAGE
-              </span>
-            </div>
-            <div className="flex items-center justify-between pr-8 md:pr-16">
-              <h2 className="text-5xl md:text-7xl font-bold uppercase tracking-tight text-black font-mono">
-                NEWS
-              </h2>
+      <div className="max-w-7xl mx-auto px-8">
+        {/* 標題區塊 */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 1.2, ease: 'easeOut' as Easing }}
+          className="mb-20"
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-[1px] bg-black/20" />
+            <span className="text-sm tracking-[0.3em] uppercase text-black/60 font-mono">
+              MEDIA COVERAGE
+            </span>
+          </div>
+          <h2 className="text-5xl md:text-7xl font-bold uppercase tracking-tight text-black font-mono">
+            媒體報導
+          </h2>
+        </motion.div>
 
-              {/* 導航按鈕 */}
-              {news.length > 1 && (
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={prevSlide}
-                    className="p-3 rounded-full border border-black/20 hover:border-black/40 transition-all duration-300"
-                  >
-                    <ChevronLeft size={24} />
-                  </button>
-                  <span className="font-mono text-sm text-black/60">
-                    {String(currentIndex + 1).padStart(2, '0')} / {String(news.length).padStart(2, '0')}
-                  </span>
-                  <button
-                    onClick={nextSlide}
-                    className="p-3 rounded-full border border-black/20 hover:border-black/40 transition-all duration-300"
-                  >
-                    <ChevronRight size={24} />
-                  </button>
-                </div>
-              )}
+        {/* 主要內容區 */}
+        <div className="flex flex-col lg:flex-row gap-16 items-start">
+          {/* 左側控制區 */}
+          <motion.div
+            className="w-full lg:w-1/3"
+            initial={{ opacity: 0, x: -30 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            {/* 導航控制 */}
+            {news.length > 1 && (
+              <div className="flex items-center gap-4 mb-8">
+                <button
+                  onClick={prevSlide}
+                  className="p-3 rounded-full border border-black/20 hover:border-black/40 transition-all duration-300"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <span className="font-mono text-sm text-black/60">
+                  {String(currentIndex + 1).padStart(2, '0')} / {String(news.length).padStart(2, '0')}
+                </span>
+                <button
+                  onClick={nextSlide}
+                  className="p-3 rounded-full border border-black/20 hover:border-black/40 transition-all duration-300"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </div>
+            )}
+
+            {/* 描述文字 */}
+            <div className="space-y-4">
+              <p className="text-black/60 font-mono text-sm leading-relaxed">
+                追蹤最新的科技趨勢與產業動態，
+                深度解析技術創新與商業應用的前沿觀點。
+              </p>
+              <div className="w-8 h-[1px] bg-black/20" />
             </div>
           </motion.div>
 
-          {/* 滑動容器 */}
+          {/* 右側新聞卡片 */}
           <div
-            className="flex-1 flex items-center overflow-hidden pl-8 md:pl-16"
+            className="flex-1"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
           >
-            <div className="relative w-full flex justify-center">
-              {/* 只顯示當前索引的新聞 */}
-              {news.length > 0 && (
-                <motion.div
-                  key={`news-${currentIndex}`}
-                  className="flex justify-center items-center"
-                  initial={{ opacity: 0, x: 100 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -100 }}
-                  transition={{
-                    duration: 0.6,
-                    ease: [0.19, 1, 0.22, 1] as Easing
-                  }}
-                >
-                  <div
-                    className="border border-black/10 rounded-3xl p-8 md:p-12 flex flex-col justify-between bg-white hover:border-black/30 transition-colors duration-300 group cursor-pointer"
-                    style={{
-                      height: 'clamp(30rem, 60vh, 40rem)',
-                      width: 'clamp(20rem, 70vw, 28rem)'
-                    }}
-                  >
-                    {/* 頂部：編號和標題 */}
-                    <div>
-                      <span className="text-sm font-mono text-black/40">
-                        ({String(currentIndex + 1).padStart(2, '0')})
-                      </span>
-                      <h3 className="text-2xl md:text-3xl font-bold uppercase mt-4 leading-tight text-black font-mono">
-                        {news[currentIndex].title.length > 30
-                          ? news[currentIndex].title.substring(0, 30) + '...'
-                          : news[currentIndex].title}
-                      </h3>
-                      <div className="mt-4 flex items-center gap-4">
-                        <span className="text-sm font-mono text-black/60">
-                          {news[currentIndex].mediaName}
-                        </span>
-                        <span className="text-sm font-mono text-black/40">
-                          {formatDate(news[currentIndex].publicationDate)}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* 中部：摘要 */}
-                    <p className="text-base leading-relaxed text-black/70 font-mono py-6">
-                      {news[currentIndex].summary}
-                    </p>
-
-                    {/* 底部：連結 */}
-                    <motion.a
-                      href={news[currentIndex].url || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-wider text-black/60 hover:text-black transition-colors duration-300"
-                      whileHover={{ x: 5 }}
-                    >
-                      Read Article
-                      <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </motion.a>
+            {news.length > 0 ? (
+              <motion.div
+                key={`news-${currentIndex}`}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.6,
+                  ease: [0.19, 1, 0.22, 1] as Easing
+                }}
+                className="border border-black/10 p-8 md:p-12 bg-white hover:border-black/30 transition-colors duration-300 group"
+              >
+                {/* 頂部：編號和媒體 */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-mono text-black/40">
+                      ({String(currentIndex + 1).padStart(2, '0')})
+                    </span>
+                    <div className="w-4 h-[1px] bg-black/20" />
                   </div>
-                </motion.div>
-              )}
-
-              {/* 如果沒有報導 */}
-              {news.length === 0 && (
-                <div className="flex justify-center items-center h-96">
-                  <p className="font-mono text-black/40 text-sm uppercase tracking-wider">
-                    No media coverage available
-                  </p>
+                  <div className="text-right">
+                    <div className="text-sm font-mono text-black/60 uppercase tracking-wider">
+                      {news[currentIndex].mediaName}
+                    </div>
+                    <div className="text-xs font-mono text-black/40 mt-1">
+                      {formatDate(news[currentIndex].publicationDate)}
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+
+                {/* 標題 */}
+                <h3 className="text-2xl md:text-3xl font-bold uppercase leading-tight text-black font-mono mb-6">
+                  {news[currentIndex].title}
+                </h3>
+
+                {/* 類型標籤 */}
+                {news[currentIndex].mediaType && (
+                  <div className="mb-6">
+                    <span className="inline-block px-3 py-1 border border-black/20 text-xs font-mono uppercase tracking-wider text-black/60">
+                      {news[currentIndex].mediaType}
+                    </span>
+                  </div>
+                )}
+
+                {/* 摘要 */}
+                <p className="text-base leading-relaxed text-black/70 font-mono mb-8">
+                  {news[currentIndex].summary}
+                </p>
+
+                {/* 底部：連結 */}
+                <motion.div
+                  className="flex items-center justify-between pt-6 border-t border-black/10"
+                >
+                  <motion.a
+                    href={news[currentIndex].url || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-wider text-black/60 hover:text-black transition-colors duration-300"
+                    whileHover={{ x: 5 }}
+                  >
+                    Read Article
+                    <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </motion.a>
+
+                  {/* 精選標記 */}
+                  {news[currentIndex].featured && (
+                    <span className="text-xs font-mono text-black/40 uppercase tracking-wider">
+                      Featured
+                    </span>
+                  )}
+                </motion.div>
+              </motion.div>
+            ) : (
+              <div className="border border-black/10 p-12 text-center">
+                <p className="font-mono text-black/40 text-sm uppercase tracking-wider">
+                  No media coverage available
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

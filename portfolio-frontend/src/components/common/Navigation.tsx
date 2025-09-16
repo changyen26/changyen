@@ -12,6 +12,7 @@ import Button from './Button';
 
 const navItems = [
   { label: 'HOME', href: '#home' },
+  { label: 'PROJECTS', href: '/projects' },
   { label: 'PATENTS', href: '#patents' },
   { label: 'COMPETITIONS', href: '#competitions' },
   { label: 'NEWS', href: '#news' },
@@ -83,10 +84,18 @@ export default function Navigation() {
     };
   }, []);
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    element?.scrollIntoView({ behavior: 'smooth' });
+  const handleNavigation = (href: string) => {
     setIsMenuOpen(false);
+
+    // 如果是外部連結（以 / 開頭），使用路由導航
+    if (href.startsWith("/")) {
+      window.location.href = href;
+      return;
+    }
+
+    // 如果是錨點連結，使用滾動
+    const element = document.querySelector(href);
+    element?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -139,7 +148,7 @@ export default function Navigation() {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  onClick={() => scrollToSection(item.href)}
+                  onClick={() => handleNavigation(item.href)}
                   className={cn(
                     'px-4 py-2 text-xs font-mono uppercase tracking-widest transition-all duration-200 relative border-b border-transparent',
                     activeSection === item.href.substring(1)
@@ -207,7 +216,7 @@ export default function Navigation() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  onClick={() => scrollToSection(item.href)}
+                  onClick={() => handleNavigation(item.href)}
                   className={cn(
                     'block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors duration-200',
                     activeSection === item.href.substring(1)

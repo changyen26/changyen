@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import type { Easing } from 'framer-motion';
 import { Code, Lightbulb, Users, Target, ArrowRight } from 'lucide-react';
@@ -9,38 +9,48 @@ import { Skill, UserInfo } from '../../types/admin';
 import { adminApi } from '../../lib/adminApi';
 import { logger } from '../../lib/logger';
 
-// About Values 介面定義
-interface AboutValue {
-  id: string;
-  icon: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  details: string[];
-  orderIndex: number;
-  isActive: boolean;
-}
-
-// 圖示映射
-const iconMap: { [key: string]: any } = {
-  'Lightbulb': Lightbulb,
-  'Code': Code,
-  'Users': Users,
-  'Target': Target,
-};
+const values = [
+  {
+    icon: Lightbulb,
+    title: '創新思維',
+    subtitle: 'Innovation',
+    description: '持續探索新技術，追求創新解決方案，推動技術進步。專注於將前沿科技應用到實際項目中，創造有意義的產品體驗。',
+    details: ['人工智能應用開發', '物聯網系統設計', '區塊鏈技術研究', '前沿技術探索']
+  },
+  {
+    icon: Code,
+    title: '技術精進',
+    subtitle: 'Excellence',
+    description: '專注於程式碼品質，追求最佳實踐，持續學習成長。堅持寫出可維護、可擴展、高性能的代碼。',
+    details: ['前後端架構設計', '代碼質量控制', '性能優化實踐', '技術棧深度學習']
+  },
+  {
+    icon: Users,
+    title: '團隊合作',
+    subtitle: 'Collaboration',
+    description: '重視團隊協作，樂於分享知識，共同實現目標。建立良好的溝通機制，促進知識共享和技能提升。',
+    details: ['跨部門協作經驗', '技術團隊領導', '知識分享文化', '敏捷開發實踐']
+  },
+  {
+    icon: Target,
+    title: '目標導向',
+    subtitle: 'Goal-Driven',
+    description: '明確目標規劃，專注執行效率，確保項目成功。從用戶需求出發，以結果為導向完成每個項目。',
+    details: ['項目管理經驗', '需求分析能力', '解決方案設計', '成果交付保證']
+  }
+];
 
 // 翻卡組件
-const FlipCard = ({ value, index, scrollProgress }: { value: AboutValue, index: number, scrollProgress: number }) => {
-  const IconComponent = iconMap[value.icon] || Code;
-
-  // 根據滾動進度和卡片索引計算是否翻開
-  // 每張卡片在不同的滾動進度閾值翻開
-  const flipThreshold = 0.2 + (index * 0.15); // 第1張:0.2, 第2張:0.35, 第3張:0.5, 第4張:0.65
-  const isFlipped = scrollProgress > flipThreshold;
+const FlipCard = ({ value, index }: { value: typeof values[0], index: number }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+  const IconComponent = value.icon;
 
   return (
     <motion.div
-      className="flip-card-container h-80 w-full"
+      className="flip-card-container h-80 w-full cursor-pointer"
+      onHoverStart={() => setIsFlipped(true)}
+      onHoverEnd={() => setIsFlipped(false)}
+      onClick={() => setIsFlipped(!isFlipped)}
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.19, 1, 0.22, 1] as Easing }}
@@ -49,7 +59,7 @@ const FlipCard = ({ value, index, scrollProgress }: { value: AboutValue, index: 
       <motion.div
         className="flip-card relative w-full h-full"
         animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] as Easing }}
+        transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] as Easing }}
         style={{ transformStyle: 'preserve-3d' }}
       >
         {/* 正面 */}
@@ -59,6 +69,7 @@ const FlipCard = ({ value, index, scrollProgress }: { value: AboutValue, index: 
         >
           <motion.div
             className="mb-6 text-black/20 group-hover:text-black/40 transition-colors duration-500"
+            whileHover={{ scale: 1.1 }}
           >
             <IconComponent size={48} strokeWidth={1} />
           </motion.div>
@@ -119,9 +130,6 @@ export default function AboutSection() {
   const [sectionRef, isInView] = useInView({ threshold: 0.1 });
   const [skillsRef, isSkillsInView] = useInView({ threshold: 0.1 });
   const [skills, setSkills] = useState<Skill[]>([]);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [aboutValues, setAboutValues] = useState<AboutValue[]>([]);
-  const cardsRef = useRef<HTMLDivElement>(null);
   const [userInfo, setUserInfo] = useState<UserInfo>({
     name: "謝長諺",
     email: "changyen26@gmail.com",
@@ -134,40 +142,6 @@ export default function AboutSection() {
     location: "台灣",
     website: ""
   });
-
-  // 監聽滾動進度
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!cardsRef.current) return;
-
-      const element = cardsRef.current;
-      const rect = element.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-
-      // 計算元素相對於視窗的滾動進度
-      // 當元素頂部到達視窗底部時為 0，完全經過視窗時為 1
-      const elementTop = rect.top;
-      const elementHeight = rect.height;
-
-      // 開始計算進度的位置（元素進入視窗）
-      const startOffset = windowHeight;
-      // 結束計算進度的位置（元素完全離開視窗）
-      const endOffset = -elementHeight;
-
-      // 計算滾動進度 (0 到 1)
-      const progress = Math.max(0, Math.min(1, (startOffset - elementTop) / (startOffset - endOffset)));
-
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    // 初始計算
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -201,20 +175,6 @@ export default function AboutSection() {
         ]);
       }
 
-      // 載入 About Values 資料
-      try {
-        const aboutData = await adminApi.getAboutValues();
-        logger.log('AboutSection loaded about values:', aboutData);
-        if (aboutData && aboutData.length > 0) {
-          // 按 orderIndex 排序並僅顯示啟用的項目
-          const sortedValues = aboutData
-            .filter(item => item.isActive)
-            .sort((a, b) => a.orderIndex - b.orderIndex);
-          setAboutValues(sortedValues);
-        }
-      } catch (error) {
-        logger.error('Failed to load about values:', error);
-      }
       // 載入用戶資料
       try {
         const userData = await adminApi.getUserInfo();
@@ -274,14 +234,13 @@ export default function AboutSection() {
 
         {/* 翻卡網格 */}
         <motion.div
-          ref={cardsRef}
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.4, ease: [0.19, 1, 0.22, 1] as Easing }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24"
         >
-          {aboutValues.map((value, index) => (
-            <FlipCard key={value.id} value={value} index={index} scrollProgress={scrollProgress} />
+          {values.map((value, index) => (
+            <FlipCard key={index} value={value} index={index} />
           ))}
         </motion.div>
 

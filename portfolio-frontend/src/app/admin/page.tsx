@@ -398,6 +398,7 @@ export default function AdminPage() {
               onClick={() => window.location.href = '/admin/media-coverage'}
             >
               管理報導
+</Button>          </Card>          <Card className="p-6 text-center hover:shadow-lg transition-shadow">            <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />              </svg>            </div>            <h3 className="text-lg font-semibold mb-2">About 內容</h3>            <p className="text-gray-600 mb-4">管理關於我頁面的翻卡內容</p>            <Button              variant="outline"              size="sm"              onClick={() => window.location.href = '/admin/about'}            >              管理內容
             </Button>
           </Card>
         </motion.div>
