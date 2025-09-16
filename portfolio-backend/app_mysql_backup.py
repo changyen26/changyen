@@ -64,7 +64,7 @@ def parse_user_agent(user_agent):
 def create_app(config_name=None):
     """應用工廠函數"""
     if config_name is None:
-        config_name = os.environ.get('FLASK_ENV', 'production')
+        config_name = os.environ.get('FLASK_ENV', 'development')
     
     app = Flask(__name__)
     app.config.from_object(config[config_name])
