@@ -5,19 +5,8 @@ import { motion } from 'framer-motion';
 import { ExternalLink, Github, Code, Calendar, Tag } from 'lucide-react';
 import { adminApi } from '../../lib/adminApi';
 import { logger } from '../../lib/logger';
+import { Project } from '../../types/admin';
 import Button from '../common/Button';
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  technologies: string[];
-  imageUrl: string;
-  githubUrl: string;
-  liveUrl: string;
-  featured: boolean;
-  createdAt: string;
-}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -41,10 +30,9 @@ const itemVariants = {
     y: 0,
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
-      damping: 15,
-      duration: 0.6
+      damping: 15
     }
   },
 };
