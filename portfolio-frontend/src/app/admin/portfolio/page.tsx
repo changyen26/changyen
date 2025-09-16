@@ -22,14 +22,14 @@ export default function PortfolioPreviewPage() {
   const loadAllData = async () => {
     try {
       setIsLoading(true);
-      const [userInfoData, projectsData, skillsData] = await Promise.all([
+      const [userInfoData, projectsResponse, skillsData] = await Promise.all([
         adminApi.getUserInfo(),
         adminApi.getProjects(),
         adminApi.getSkills()
       ]);
       
       setUserInfo(userInfoData);
-      setProjects(projectsData || []);
+      setProjects(projectsResponse.success && projectsResponse.data ? projectsResponse.data : []);
       setSkills(skillsData || []);
     } catch {
       logger.error('Failed to load data:');

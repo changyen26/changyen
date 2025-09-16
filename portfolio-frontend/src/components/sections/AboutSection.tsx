@@ -22,7 +22,7 @@ interface AboutValue {
 }
 
 // 圖示映射
-const iconMap: { [key: string]: any } = {
+const iconMap: { [key: string]: React.ComponentType<any> } = {
   'Lightbulb': Lightbulb,
   'Code': Code,
   'Users': Users,

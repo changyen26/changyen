@@ -8,6 +8,17 @@ interface ApiResponse<T> {
   error?: string;
 }
 
+// About Value 介面
+interface AboutValue {
+  id: string;
+  icon: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  details: string[];
+  orderIndex: number;
+  isActive: boolean;
+}
 // 分析數據介面
 interface AnalyticsData {
   pageViews: number;
@@ -976,7 +987,7 @@ class AdminApiService {
 
   // 新聞管理
   // About Values 管理
-  async getAboutValues(): Promise<any[]> {
+  async getAboutValues(): Promise<AboutValue[]> {
     try {
       if (API_BASE_URL) {
         const response = await fetch(`${API_BASE_URL}/api/v1/about-values`);
@@ -991,7 +1002,7 @@ class AdminApiService {
     }
   }
 
-  async createAboutValue(data: any): Promise<boolean> {
+  async createAboutValue(data: AboutValue): Promise<boolean> {
     try {
       if (API_BASE_URL) {
         const response = await fetch(`${API_BASE_URL}/api/v1/about-values`, {
@@ -1008,7 +1019,7 @@ class AdminApiService {
     }
   }
 
-  async updateAboutValue(id: string, data: any): Promise<boolean> {
+  async updateAboutValue(id: string, data: Partial<AboutValue>): Promise<boolean> {
     try {
       if (API_BASE_URL) {
         const response = await fetch(`${API_BASE_URL}/api/v1/about-values/${id}`, {

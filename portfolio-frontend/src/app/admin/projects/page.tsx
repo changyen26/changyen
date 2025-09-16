@@ -31,8 +31,7 @@ export default function ProjectsPage() {
 
   const loadProjects = async () => {
     try {
-      const projectData = await adminApi.getProjects();
-      setProjects(projectData || []);
+      const projectsResponse = await adminApi.getProjects();      setProjects(projectsResponse.success && projectsResponse.data ? projectsResponse.data : []);
     } catch {
       logger.error('Failed to load projects:');
     }
