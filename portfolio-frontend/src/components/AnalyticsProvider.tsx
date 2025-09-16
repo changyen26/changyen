@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { useAutoTracking } from '../hooks/useAnalytics';
+import React, { useEffect } from 'react';
+import { initAnalytics } from '../lib/analytics';
 
 interface AnalyticsProviderProps {
   children: React.ReactNode;
@@ -12,11 +12,15 @@ interface AnalyticsProviderProps {
  * 在應用程式根部使用，自動啟用流量追蹤功能
  */
 export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
-  // 啟用自動追蹤
-  useAutoTracking();
+  useEffect(() => {
+    // 只在客戶端初始化分析
+    if (typeof window !== 'undefined') {
+      initAnalytics();
+    }
+  }, []);
 
-  // 直接返回 children，避免使用 Fragment 造成 hydration 問題
-  return children as React.ReactElement;
+  // 不使用任何包裹元素，直接返回 children
+  return <>{children}</>;
 }
 
 export default AnalyticsProvider;
